@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import json
 import os
 import threading
@@ -112,7 +112,7 @@ def langsmith_traceable(*, name: str, run_type: str, tags: list[str] | None = No
     return traceable(
         name=name,
         run_type=run_type,
-        tags=tags or ["agentnews"],
+        tags=tags or ["newscopilot"],
         client=LANGSMITH_CLIENT,
         project_name=settings.langsmith_project,
         enabled=is_langsmith_configured(),
@@ -133,7 +133,7 @@ def build_langsmith_extra(
             "node": node,
             **(metadata or {}),
         },
-        "tags": ["agentnews", node, *(tags or [])],
+        "tags": ["newscopilot", node, *(tags or [])],
     }
 
 
@@ -145,7 +145,7 @@ def langsmith_context(*, run_context: dict, metadata: dict | None = None):
         project_name=settings.langsmith_project,
         client=LANGSMITH_CLIENT,
         enabled=True,
-        tags=["agentnews", "workflow"],
+        tags=["newscopilot", "workflow"],
         metadata={
             "trace_id": run_context.get("traceId", ""),
             "run_id": run_context.get("runId", ""),
@@ -226,3 +226,4 @@ def get_runtime_status() -> dict:
         "langsmithProject": settings.langsmith_project,
         "langsmithEndpoint": settings.langsmith_endpoint,
     }
+

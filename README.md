@@ -1,6 +1,6 @@
-﻿# AgentNews
+﻿# NewsCopilot
 
-AgentNews is a mobile-first news platform with an enterprise-style AI agent stack. The project combines a Vue 3 news app, a FastAPI backend, MySQL, Redis caching, Qdrant-based local vector retrieval, Tavily web search, LangGraph workflow orchestration, and LangSmith tracing.
+NewsCopilot is a mobile-first news platform with an enterprise-style AI agent stack. The project combines a Vue 3 news app, a FastAPI backend, MySQL, Redis caching, Qdrant-based local vector retrieval, Tavily web search, LangGraph workflow orchestration, and LangSmith tracing.
 
 ## What The Project Focuses On
 
@@ -148,22 +148,11 @@ This covers:
 - backend integration checks
 - frontend production build
 
-## Suggested Reading Order
+## Notes
 
-- [docs/project-status-and-next-step.md](docs/project-status-and-next-step.md)
-- [docs/architecture-overview.md](docs/architecture-overview.md)
-- [docs/architecture-diagrams.md](docs/architecture-diagrams.md)
-- [docs/documentation-map.md](docs/documentation-map.md)
-- [docs/m4-ci-and-delivery-hardening.md](docs/m4-ci-and-delivery-hardening.md)
-- [docs/m4-automated-smoke-tests.md](docs/m4-automated-smoke-tests.md)
-- [docs/m4-integration-tests-and-final-showcase.md](docs/m4-integration-tests-and-final-showcase.md)
-- [docs/m4-dev-check-and-demo-materials.md](docs/m4-dev-check-and-demo-materials.md)
-- [docs/demo-script.md](docs/demo-script.md)
-- [docs/github-showcase-guide.md](docs/github-showcase-guide.md)
-- [docs/m3-session-memory-and-summary.md](docs/m3-session-memory-and-summary.md)
-- [docs/m3-session-window-management.md](docs/m3-session-window-management.md)
-- [docs/final-delivery-checklist.md](docs/final-delivery-checklist.md)
-- [docs/testing-checklist.md](docs/testing-checklist.md)
-- [docs/agent-method-evolution.md](docs/agent-method-evolution.md)
+- The public GitHub repo keeps the code, configuration template, CI, and delivery scripts.
+- Deep development notes and stage-by-stage process documents are kept locally and are not published in the repo.
+- If you want to verify the project end to end, run `powershell -ExecutionPolicy Bypass -File .\scripts\dev-check.ps1`.
+
 
 

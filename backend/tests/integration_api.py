@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import sys
 from pathlib import Path
@@ -158,4 +158,5 @@ def run_integration_checks() -> None:
 
 if __name__ == "__main__":
     run_integration_checks()
-    print("AgentNews integration checks passed.")
+    print("NewsCopilot integration checks passed.")
+

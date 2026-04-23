@@ -1,4 +1,4 @@
-import { request } from './http'
+﻿import { request } from './http'
 
 
 function normalizeCategory(item = {}) {
@@ -16,7 +16,7 @@ function normalizeNewsItem(item = {}) {
     title: item.title || '',
     description: item.description || '',
     image: item.image || '',
-    author: item.author || 'AgentNews',
+    author: item.author || 'NewsCopilot',
     categoryId: Number(item.categoryId ?? item.category_id ?? 0),
     views: Number(item.views || 0),
     publishTime: item.publishTime || item.publish_time || '',
@@ -80,3 +80,4 @@ export async function fetchHotNews(params = {}) {
 
   return Array.isArray(data) ? data.map(normalizeNewsItem) : []
 }
+

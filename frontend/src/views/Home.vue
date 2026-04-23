@@ -1,6 +1,6 @@
-<template>
+﻿<template>
   <div class="home-page">
-    <van-nav-bar title="AgentNews" fixed>
+    <van-nav-bar title="NewsCopilot" fixed>
       <template #right>
         <button class="nav-action" type="button" @click="goToCategory">
           全部分类
@@ -11,7 +11,7 @@
     <div class="home-shell">
       <section class="hero-panel">
         <p class="hero-kicker">新闻 Agent 基座</p>
-        <h1 class="hero-title">移动端新闻流与热门脉搏一起跑</h1>
+        <h1 class="hero-title">移动端新闻流与热门趋势一体化体验</h1>
         <p class="hero-summary">
           当前分类：{{ activeCategoryLabel }}。列表走缓存链路，热榜走 Redis 实时热度。
         </p>
@@ -20,7 +20,7 @@
       <section class="hot-panel">
         <div class="section-head">
           <div>
-            <p class="section-eyebrow">热点快读</p>
+            <p class="section-eyebrow">热门快读</p>
             <h2 class="section-title">当前分类下的热门新闻</h2>
           </div>
           <button class="section-action" type="button" @click="refreshHotNews">
@@ -38,7 +38,7 @@
             <div class="hero-hot-main">
               <h3 class="hero-hot-title">{{ heroNews.title }}</h3>
               <p class="hero-hot-desc">
-                {{ heroNews.description || '基于实时热度排序，适合面试演示 Redis 计数与回刷链路。' }}
+                {{ heroNews.description || '基于实时热度排序，适合展示 Redis 计数与回刷链路。' }}
               </p>
               <div class="hero-hot-meta">
                 <span>{{ formatPublishTime(heroNews.publishTime) }}</span>
@@ -479,3 +479,4 @@ watch(
   font-size: 14px;
 }
 </style>
+

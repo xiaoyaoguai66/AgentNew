@@ -1,11 +1,11 @@
-<template>
+﻿<template>
   <article class="news-card click-effect" @click="goToDetail">
     <div class="news-main">
       <p class="news-badge">即时资讯</p>
       <h3 class="news-title">{{ news.title }}</h3>
       <p v-if="news.description" class="news-desc">{{ news.description }}</p>
       <div class="news-meta">
-        <span>{{ news.author || 'AgentNews' }}</span>
+        <span>{{ news.author || 'NewsCopilot' }}</span>
         <span>{{ publishTime }}</span>
         <span>{{ viewCount }} 阅读</span>
       </div>
@@ -136,3 +136,4 @@ const goToDetail = () => {
   letter-spacing: 0.12em;
 }
 </style>
+

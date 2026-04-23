@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+﻿import { createRouter, createWebHistory } from 'vue-router'
 
 
 const routes = [
@@ -115,9 +115,10 @@ const router = createRouter({
 
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || 'AgentNews'
+  document.title = to.meta.title || 'NewsCopilot'
   next()
 })
 
 
 export default router
+

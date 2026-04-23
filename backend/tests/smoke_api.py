@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import sys
 from pathlib import Path
@@ -65,7 +65,7 @@ def run_smoke_checks() -> None:
     try:
         with TestClient(main.app) as client:
             root_payload = _assert_plain_success(client.get("/"), "/")
-            assert root_payload["service"] == "AgentNews API"
+            assert root_payload["service"] == "NewsCopilot API"
 
             health_payload = _assert_plain_success(client.get("/health"), "/health")
             assert health_payload["status"] == "healthy"
@@ -133,4 +133,5 @@ def run_smoke_checks() -> None:
 
 if __name__ == "__main__":
     run_smoke_checks()
-    print("AgentNews smoke checks passed.")
+    print("NewsCopilot smoke checks passed.")
+

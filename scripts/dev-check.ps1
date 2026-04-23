@@ -1,4 +1,4 @@
-Set-StrictMode -Version Latest
+﻿Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -49,4 +49,5 @@ finally {
     Pop-Location
 }
 
-Write-Host "AgentNews dev-check passed."
+Write-Host "NewsCopilot dev-check passed."
+

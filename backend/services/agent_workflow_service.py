@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
@@ -374,7 +374,7 @@ def get_runtime_status() -> dict:
 
 
 @agent_observability_service.langsmith_traceable(
-    name="AgentNews Workflow",
+    name="NewsCopilot Workflow",
     run_type="chain",
     tags=["workflow"],
 )
@@ -659,3 +659,4 @@ async def chat(db: AsyncSession, data: AiChatRequest) -> AiChatResponse:
                 metadata={"question_length": len(data.question)},
             ),
         )
+

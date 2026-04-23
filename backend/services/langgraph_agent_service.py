@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import logging
 import time
 from functools import lru_cache
@@ -497,8 +497,8 @@ async def chat(db: AsyncSession, data: AiChatRequest) -> AiChatResponse:
             result = await graph.ainvoke(
                 initial_state,
                 config={
-                    "run_name": "AgentNews Workflow",
-                    "tags": ["agentnews", "langgraph", "stategraph"],
+                    "run_name": "NewsCopilot Workflow",
+                    "tags": ["newscopilot", "langgraph", "stategraph"],
                 },
                 context={
                     "db": db,
@@ -541,3 +541,4 @@ async def chat(db: AsyncSession, data: AiChatRequest) -> AiChatResponse:
             error_message=str(exc),
         )
         raise
+

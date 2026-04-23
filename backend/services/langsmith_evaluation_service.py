@@ -1,7 +1,7 @@
-from services import agent_evaluation_service, agent_observability_service
+﻿from services import agent_evaluation_service, agent_observability_service
 
 
-DEFAULT_DATASET_NAME = "agentnews-planner-baseline"
+DEFAULT_DATASET_NAME = "newscopilot-planner-baseline"
 
 
 def get_runtime_status() -> dict:
@@ -65,7 +65,7 @@ def sync_dataset(*, limit: int = 20, case_ids: list[str] | None = None, dataset_
     client = agent_observability_service.LANGSMITH_CLIENT
     dataset = client.create_dataset(
         dataset_name=payload["datasetName"],
-        description="AgentNews planner and query-analysis baseline dataset",
+        description="NewsCopilot planner and query-analysis baseline dataset",
     )
     client.create_examples(
         dataset_id=dataset.id,
@@ -80,3 +80,4 @@ def sync_dataset(*, limit: int = 20, case_ids: list[str] | None = None, dataset_
         "datasetId": str(dataset.id),
         "note": "LangSmith 数据集已创建，可在平台继续做评测与实验。",
     }
+

@@ -1,4 +1,4 @@
-import os
+﻿import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -81,7 +81,7 @@ class Settings:
     enable_vector_retrieval: bool = _parse_bool(os.getenv("ENABLE_VECTOR_RETRIEVAL"), default=False)
     qdrant_url: str = os.getenv("QDRANT_URL", "")
     qdrant_api_key: str = os.getenv("QDRANT_API_KEY", "")
-    qdrant_collection: str = os.getenv("QDRANT_COLLECTION", "agentnews_news_chunks")
+    qdrant_collection: str = os.getenv("QDRANT_COLLECTION", "newscopilot_news_chunks")
     qdrant_timeout_seconds: int = _parse_int(os.getenv("QDRANT_TIMEOUT_SECONDS"), 5)
     qdrant_local_path: str = os.getenv("QDRANT_LOCAL_PATH", str(PROJECT_ROOT / "backend" / "data" / "qdrant"))
     embedding_base_url: str = os.getenv("EMBEDDING_BASE_URL", "")
@@ -89,7 +89,7 @@ class Settings:
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "")
     langsmith_tracing: bool = _parse_bool(os.getenv("LANGSMITH_TRACING"), default=False)
     langsmith_api_key: str = os.getenv("LANGSMITH_API_KEY", "")
-    langsmith_project: str = os.getenv("LANGSMITH_PROJECT", "agentnews-dev")
+    langsmith_project: str = os.getenv("LANGSMITH_PROJECT", "newscopilot-dev")
     langsmith_endpoint: str = os.getenv("LANGSMITH_ENDPOINT", "https://api.smith.langchain.com")
     agent_run_log_path: str = os.getenv(
         "AGENT_RUN_LOG_PATH",
@@ -121,3 +121,4 @@ class Settings:
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return Settings()
+

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="news-detail-page">
     <van-nav-bar
       title="新闻详情"
@@ -48,7 +48,7 @@
           <div class="meta-grid">
             <div class="meta-chip">
               <span class="meta-label">作者</span>
-              <span class="meta-value">{{ newsDetail.author || 'AgentNews' }}</span>
+              <span class="meta-value">{{ newsDetail.author || 'NewsCopilot' }}</span>
             </div>
             <div class="meta-chip">
               <span class="meta-label">发布时间</span>
@@ -580,3 +580,4 @@ watch(
   }
 }
 </style>
+

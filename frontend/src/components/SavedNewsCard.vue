@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <article class="saved-card click-effect" @click="emit('select', news.id)">
     <div class="saved-cover" :class="{ placeholder: !news.image }">
       <img v-if="news.image" :src="news.image" :alt="news.title">
@@ -22,7 +22,7 @@
       <p v-if="news.description" class="saved-desc">{{ news.description }}</p>
 
       <div class="saved-meta">
-        <span>{{ news.author || 'AgentNews' }}</span>
+        <span>{{ news.author || 'NewsCopilot' }}</span>
         <span>{{ publishTime }}</span>
         <span>{{ viewCount }} 阅读</span>
       </div>
@@ -181,3 +181,4 @@ const viewCount = computed(() => formatViewCount(props.news.views))
   line-height: 1.5;
 }
 </style>
+

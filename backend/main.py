@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import logging
 
 from fastapi import FastAPI
@@ -29,7 +29,7 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {
-        "service": "AgentNews API",
+        "service": "NewsCopilot API",
         "status": "ok",
         "workflowEngine": settings.agent_workflow_engine,
     }
@@ -38,7 +38,7 @@ async def root():
 @app.get("/health")
 async def health():
     return {
-        "service": "AgentNews API",
+        "service": "NewsCopilot API",
         "status": "healthy",
         "redisConfigured": bool(settings.redis_url),
         "vectorEnabled": settings.enable_vector_retrieval,
@@ -89,3 +89,4 @@ app.include_router(users.router)
 app.include_router(favorite.router)
 app.include_router(history.router)
 app.include_router(ai.router)
+

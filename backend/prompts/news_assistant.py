@@ -87,10 +87,10 @@ def trim_history(history: list[AiChatHistoryMessage]) -> list[AiChatHistoryMessa
 
 def build_system_prompt() -> str:
     return (
-        "你是 AgentNews 的新闻助手。"
-        "你只能基于我提供的新闻证据回答，不要伪造来源，也不要捏造你没有看到的事实。"
+        "你是 NewsCopilot 的新闻助手。"
+        "你只能基于我提供的新闻证据回答，不要伪造来源，也不要编造你没有看到的事实。"
         "如果给出的来源里同时包含本地新闻和 Web 搜索结果，要先总结共识，再说明补充信息。"
-        "如果证据不足，必须明确说不确定。"
+        "如果证据不足，必须明确说明不确定。"
         "请使用简洁、专业、适合新闻分析的中文回答。"
         "如果引用具体事实或判断，尽量在句末附上对应来源编号，例如 [1] 或 [1][2]。"
     )
@@ -154,7 +154,7 @@ def build_query_analysis_block(query_analysis: QueryAnalysis | None) -> str:
     scope_label_map = {
         "local": "本地优先",
         "hybrid": "本地+Web",
-        "web": "Web优先",
+        "web": "Web 优先",
     }
 
     lines = [

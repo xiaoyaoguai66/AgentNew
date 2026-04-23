@@ -1,15 +1,15 @@
-version: "3.9"
+﻿version: "3.9"
 
 services:
   mysql:
     image: mysql:8.4
-    container_name: agentnews-mysql
+    container_name: newscopilot-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: agentnews
-      MYSQL_USER: agentnews
-      MYSQL_PASSWORD: agentnews
+      MYSQL_DATABASE: newscopilot
+      MYSQL_USER: newscopilot
+      MYSQL_PASSWORD: newscopilot
     ports:
       - "3306:3306"
     command:
@@ -20,7 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: agentnews-redis
+    container_name: newscopilot-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -31,13 +31,13 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: agentnews-backend
+    container_name: newscopilot-backend
     restart: unless-stopped
     depends_on:
       - mysql
       - redis
     environment:
-      MYSQL_URL: mysql+aiomysql://agentnews:agentnews@mysql:3306/agentnews?charset=utf8mb4
+      MYSQL_URL: mysql+aiomysql://newscopilot:newscopilot@mysql:3306/newscopilot?charset=utf8mb4
       REDIS_URL: redis://redis:6379/0
       APP_ENV: docker
       DEBUG: "false"
@@ -48,7 +48,7 @@ services:
       ENABLE_VECTOR_RETRIEVAL: "true"
       QDRANT_URL: ""
       QDRANT_LOCAL_PATH: /app/backend/data/qdrant
-      QDRANT_COLLECTION: agentnews_news_chunks
+      QDRANT_COLLECTION: newscopilot_news_chunks
       QDRANT_TIMEOUT_SECONDS: 5
     env_file:
       - .env
@@ -63,7 +63,7 @@ services:
       dockerfile: frontend/Dockerfile
       args:
         VITE_API_BASE_URL: http://localhost:8000
-    container_name: agentnews-frontend
+    container_name: newscopilot-frontend
     restart: unless-stopped
     depends_on:
       - backend
@@ -74,3 +74,4 @@ volumes:
   mysql_data:
   redis_data:
   backend_data:
+

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="ai-assistant-page">
     <van-nav-bar title="新闻 AI 助手" fixed>
       <template #left>
@@ -31,7 +31,7 @@
         </div>
 
         <div class="session-panel-hint">
-          当前会话会保存在后端 Redis 中，支持切换、恢复和删除。
+          当前会话保存在后端 Redis 中，支持切换、恢复和删除。
         </div>
 
         <div v-if="sessionListLoading" class="session-loading">
@@ -217,7 +217,7 @@
                   v-if="message.role === 'assistant' && typeof message.confidence === 'number'"
                   class="answer-confidence"
                 >
-                  可信度 {{ formatConfidence(message.confidence) }}
+                  可信度：{{ formatConfidence(message.confidence) }}
                 </div>
 
                 <div
@@ -353,7 +353,7 @@ import {
 } from '../api/ai'
 
 
-const SESSION_STORAGE_KEY = 'agentnews-ai-session-id'
+const SESSION_STORAGE_KEY = 'newscopilot-ai-session-id'
 
 const router = useRouter()
 
@@ -475,7 +475,7 @@ const createWelcomeMessage = () =>
     kind: 'welcome',
     metaLabel: '新闻助手',
     content:
-      '你好，我是 AgentNews 新闻助手。我会优先从本地新闻库检索证据；如果已配置 Tavily，也会补充 Web 搜索来源，并在工作流中做过滤、排序、校验和会话记忆管理。',
+      '你好，我是 NewsCopilot 新闻助手。我会优先从本地新闻库检索证据；如果已配置 Tavily，也会补充 Web 搜索来源，并在工作流中做过滤、排序、校验和会话记忆管理。',
     confidence: null,
     sources: [],
     retrievalPlan: '',
@@ -1614,3 +1614,4 @@ onActivated(async () => {
   }
 }
 </style>
+
