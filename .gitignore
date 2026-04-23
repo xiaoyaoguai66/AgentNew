@@ -14,3 +14,4 @@ debug-*.log
 backend/data/qdrant/
 backend/data/agent_runs/
 backend/data/evals/*.jsonl
+.local-docs/
