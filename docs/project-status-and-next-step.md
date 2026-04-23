@@ -1,4 +1,4 @@
-# AgentNews Status And Next Step
+﻿# AgentNews Status And Next Step
 
 ## 1. Conclusion
 
@@ -34,12 +34,12 @@ The core product plan is already implemented. The remaining work is mostly polis
 
 ## 4. Recommended Reading Order
 
-1. [README.md](D:/Code/Fastapi/AgentNews/README.md)
-2. [architecture-overview.md](D:/Code/Fastapi/AgentNews/docs/architecture-overview.md)
-3. [documentation-map.md](D:/Code/Fastapi/AgentNews/docs/documentation-map.md)
-4. [demo-script.md](D:/Code/Fastapi/AgentNews/docs/demo-script.md)
-5. [testing-checklist.md](D:/Code/Fastapi/AgentNews/docs/testing-checklist.md)
-6. [agent-method-evolution.md](D:/Code/Fastapi/AgentNews/docs/agent-method-evolution.md)
+1. [README.md](../README.md)
+2. [architecture-overview.md](architecture-overview.md)
+3. [documentation-map.md](documentation-map.md)
+4. [demo-script.md](demo-script.md)
+5. [testing-checklist.md](testing-checklist.md)
+6. [agent-method-evolution.md](agent-method-evolution.md)
 
 ## 5. Suggested Public-Facing Next Step
 
@@ -49,3 +49,4 @@ If the goal is a stronger GitHub showcase, the next best additions are:
 - a polished system architecture graphic
 - a short release/deployment note
 - a visual "baseline to hybrid retrieval" evolution diagram
+

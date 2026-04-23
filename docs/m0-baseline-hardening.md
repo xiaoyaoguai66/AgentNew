@@ -1,4 +1,4 @@
-# M0.1 + M0.2 Baseline Hardening
+﻿# M0.1 + M0.2 Baseline Hardening
 
 ## Goal
 
@@ -170,3 +170,4 @@ M1 will build on this baseline:
 - cache-aside for categories, lists, details, related news
 - Redis-based view count aggregation
 - hot ranking groundwork
+

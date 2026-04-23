@@ -1,4 +1,4 @@
-# AgentNews Final Delivery Checklist
+﻿# AgentNews Final Delivery Checklist
 
 Use this checklist before pushing a public-facing update or demonstrating the project.
 
@@ -19,15 +19,15 @@ Use this checklist before pushing a public-facing update or demonstrating the pr
 
 ## 3. Public Documentation
 
-- [README.md](D:/Code/Fastapi/AgentNews/README.md) is up to date
-- [architecture-overview.md](D:/Code/Fastapi/AgentNews/docs/architecture-overview.md) matches the current implementation
-- [architecture-diagrams.md](D:/Code/Fastapi/AgentNews/docs/architecture-diagrams.md) still reflects the real workflow
-- [documentation-map.md](D:/Code/Fastapi/AgentNews/docs/documentation-map.md) points only to public project docs
-- [github-showcase-guide.md](D:/Code/Fastapi/AgentNews/docs/github-showcase-guide.md) matches the current repo layout
+- [README.md](../README.md) is up to date
+- [architecture-overview.md](architecture-overview.md) matches the current implementation
+- [architecture-diagrams.md](architecture-diagrams.md) still reflects the real workflow
+- [documentation-map.md](documentation-map.md) points only to public project docs
+- [github-showcase-guide.md](github-showcase-guide.md) matches the current repo layout
 
 ## 4. Demo Readiness
 
-- [demo-script.md](D:/Code/Fastapi/AgentNews/docs/demo-script.md) has been reviewed
+- [demo-script.md](demo-script.md) has been reviewed
 - the core user flow still works: home -> detail -> AI -> session switch
 - at least one retrieval + trace + evaluation path is working end-to-end
 
@@ -43,3 +43,4 @@ Use this checklist before pushing a public-facing update or demonstrating the pr
 - prepare screenshots or short demo clips
 - check the GitHub repo homepage renders the root README correctly
 - confirm the default branch points to the latest public project version
+

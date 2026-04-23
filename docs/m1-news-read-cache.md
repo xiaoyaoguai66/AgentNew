@@ -1,4 +1,4 @@
-# M1.1 + M1.2 News Read Cache
+﻿# M1.1 + M1.2 News Read Cache
 
 ## Goal
 
@@ -199,3 +199,4 @@ Next M1 step will focus on write-side optimization:
 - Redis view delta
 - periodic MySQL flush
 - groundwork for hot ranking
+

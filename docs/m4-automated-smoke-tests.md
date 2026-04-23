@@ -1,33 +1,27 @@
-# M4 自动化冒烟测试
+﻿# M4 鑷姩鍖栧啋鐑熸祴璇?
+## 1. 杩欎竴杞仛浜嗕粈涔?
+杩欎竴杞ˉ鐨勬槸鏈€鍩虹鐨勪竴濂楄嚜鍔ㄥ寲鍐掔儫娴嬭瘯锛岃€屼笉鏄洿閲嶇殑鍗曞厓娴嬭瘯妗嗘灦銆傛牳蹇冩枃浠讹細
 
-## 1. 这一轮做了什么
+- [backend/tests/smoke_api.py](../backend/tests/smoke_api.py)
+- [.github/workflows/ci.yml](../.github/workflows/ci.yml)
 
-这一轮补的是最基础的一套自动化冒烟测试，而不是更重的单元测试框架。核心文件：
+## 2. 涓轰粈涔堣繖鏍峰仛
 
-- [backend/tests/smoke_api.py](D:/Code/Fastapi/AgentNews/backend/tests/smoke_api.py)
-- [.github/workflows/ci.yml](D:/Code/Fastapi/AgentNews/.github/workflows/ci.yml)
+褰撳墠椤圭洰宸茬粡鏈夊緢澶氳兘鍔涳細
 
-## 2. 为什么这样做
-
-当前项目已经有很多能力：
-
-- 新闻主链路
-- AI 状态接口
-- 工作流图导出
+- 鏂伴椈涓婚摼璺?- AI 鐘舵€佹帴鍙?- 宸ヤ綔娴佸浘瀵煎嚭
 - planner baseline eval
 - response-level eval
 
-如果每次继续迭代都只靠手工点页面，很容易漏掉明显回归。  
-但如果一开始就上很重的测试框架和大量 mock，成本也不划算。
-
-所以这里先做的是：
+濡傛灉姣忔缁х画杩唬閮藉彧闈犳墜宸ョ偣椤甸潰锛屽緢瀹规槗婕忔帀鏄庢樉鍥炲綊銆? 
+浣嗗鏋滀竴寮€濮嬪氨涓婂緢閲嶇殑娴嬭瘯妗嗘灦鍜屽ぇ閲?mock锛屾垚鏈篃涓嶅垝绠椼€?
+鎵€浠ヨ繖閲屽厛鍋氱殑鏄細
 
 - compile / build gate
-- 关键接口 smoke check
+- 鍏抽敭鎺ュ彛 smoke check
 
-## 3. smoke_api.py 做了什么
-
-它会直接导入 FastAPI app，并用 `TestClient` 跑这些关键检查：
+## 3. smoke_api.py 鍋氫簡浠€涔?
+瀹冧細鐩存帴瀵煎叆 FastAPI app锛屽苟鐢?`TestClient` 璺戣繖浜涘叧閿鏌ワ細
 
 - `/`
 - `/health`
@@ -40,32 +34,28 @@
 - `/api/ai/eval/run`
 - `/api/ai/eval/response/dataset`
 - `/api/ai/eval/response/run`
-- `/api/ai/session/{id}` 删除
+- `/api/ai/session/{id}` 鍒犻櫎
 
-这里会把更底层的聊天能力替换成一个 fake 响应，目的不是测试真实模型，而是验证：
+杩欓噷浼氭妸鏇村簳灞傜殑鑱婂ぉ鑳藉姏鏇挎崲鎴愪竴涓?fake 鍝嶅簲锛岀洰鐨勪笉鏄祴璇曠湡瀹炴ā鍨嬶紝鑰屾槸楠岃瘉锛?
+- 璺敱鏄惁杩樺湪
+- schema 鏄惁鍖归厤
+- 鍏抽敭涓婚摼璺槸鍚︽病鏂?
+## 4. 涓轰粈涔堜笉鍦?CI 閲岀洿鎺ヨ窇鐪熷疄 AI 瀵硅瘽
 
-- 路由是否还在
-- schema 是否匹配
-- 关键主链路是否没断
-
-## 4. 为什么不在 CI 里直接跑真实 AI 对话
-
-因为真实 AI 链路依赖：
-
+鍥犱负鐪熷疄 AI 閾捐矾渚濊禆锛?
 - LLM key
 - Tavily key
-- 网络
-- 有时还依赖本地数据库内容
+- 缃戠粶
+- 鏈夋椂杩樹緷璧栨湰鍦版暟鎹簱鍐呭
 
-这会让 CI 变得脆弱，也会让它失去“基础回归闸门”的价值。
-
-## 5. 本地怎么跑
-
+杩欎細璁?CI 鍙樺緱鑴嗗急锛屼篃浼氳瀹冨け鍘烩€滃熀纭€鍥炲綊闂搁棬鈥濈殑浠峰€笺€?
+## 5. 鏈湴鎬庝箞璺?
 ```powershell
-cd D:\Code\Fastapi\AgentNews\backend
+cd backend
 .venv\Scripts\python.exe tests\smoke_api.py
 ```
 
-## 6. 这一层的意义
+## 6. 杩欎竴灞傜殑鎰忎箟
 
-这一轮不是功能变多了，而是项目更像正式工程了。因为从这里开始，项目不仅有功能、有文档，也有最基本的自动化验证能力。
+杩欎竴杞笉鏄姛鑳藉彉澶氫簡锛岃€屾槸椤圭洰鏇村儚姝ｅ紡宸ョ▼浜嗐€傚洜涓轰粠杩欓噷寮€濮嬶紝椤圭洰涓嶄粎鏈夊姛鑳姐€佹湁鏂囨。锛屼篃鏈夋渶鍩烘湰鐨勮嚜鍔ㄥ寲楠岃瘉鑳藉姏銆?
+

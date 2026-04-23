@@ -1,17 +1,16 @@
-# M4: Integration Tests And Final Showcase
+﻿# M4: Integration Tests And Final Showcase
 
-This phase closed the gap between “the project works locally” and “the project is ready for a public repository.”
-
+This phase closed the gap between 鈥渢he project works locally鈥?and 鈥渢he project is ready for a public repository.鈥?
 ## What Was Added
 
 - backend integration test:
-  - [integration_api.py](D:/Code/Fastapi/AgentNews/backend/tests/integration_api.py)
+  - [integration_api.py](../backend/tests/integration_api.py)
 - CI linkage:
-  - [.github/workflows/ci.yml](D:/Code/Fastapi/AgentNews/.github/workflows/ci.yml)
+  - [.github/workflows/ci.yml](../.github/workflows/ci.yml)
 - public showcase materials:
-  - [demo-script.md](D:/Code/Fastapi/AgentNews/docs/demo-script.md)
-  - [final-delivery-checklist.md](D:/Code/Fastapi/AgentNews/docs/final-delivery-checklist.md)
-  - [github-showcase-guide.md](D:/Code/Fastapi/AgentNews/docs/github-showcase-guide.md)
+  - [demo-script.md](demo-script.md)
+  - [final-delivery-checklist.md](final-delivery-checklist.md)
+  - [github-showcase-guide.md](github-showcase-guide.md)
 
 ## Why It Matters
 
@@ -28,7 +27,7 @@ Together, this stage strengthens:
 Run the repo-level check:
 
 ```powershell
-cd D:\Code\Fastapi\AgentNews
+cd .
 powershell -ExecutionPolicy Bypass -File .\scripts\dev-check.ps1
 ```
 
@@ -37,3 +36,5 @@ Then confirm the repository root README still explains:
 - the product scope
 - the architecture
 - the validation path
+
+

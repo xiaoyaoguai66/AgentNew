@@ -1,61 +1,54 @@
-# M3.15 LangSmith SDK Tracing 测试清单
+﻿# M3.15 LangSmith SDK Tracing 娴嬭瘯娓呭崟
 
-## 1. SDK 是否安装
+## 1. SDK 鏄惁瀹夎
 
-确认后端虚拟环境已安装：
+纭鍚庣铏氭嫙鐜宸插畨瑁咃細
 
 - `langsmith`
 
-当前项目已写入：
+褰撳墠椤圭洰宸插啓鍏ワ細
 
 - `backend/requirements.txt`
 
-## 2. 环境变量
+## 2. 鐜鍙橀噺
 
-根目录 `.env` 建议至少配置：
-
+鏍圭洰褰?`.env` 寤鸿鑷冲皯閰嶇疆锛?
 ```env
 LANGSMITH_TRACING=true
-LANGSMITH_API_KEY=你的_langsmith_key
+LANGSMITH_API_KEY=浣犵殑_langsmith_key
 LANGSMITH_PROJECT=agentnews-dev
 LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 ```
 
-如果暂时不想接官方平台，可以设：
+濡傛灉鏆傛椂涓嶆兂鎺ュ畼鏂瑰钩鍙帮紝鍙互璁撅細
 
 ```env
 LANGSMITH_TRACING=false
 ```
 
-## 3. 状态接口检查
-
-访问：
-
+## 3. 鐘舵€佹帴鍙ｆ鏌?
+璁块棶锛?
 - `GET /api/ai/status`
 
-重点确认：
-
+閲嶇偣纭锛?
 - `observabilityEnabled = true`
 - `langsmithReady = true`
 - `langsmithTracing = true/false`
 - `langsmithConfigured = true/false`
 
-### 预期
+### 棰勬湡
 
-- 只装 SDK、没配 key：
-  - `langsmithReady = true`
+- 鍙 SDK銆佹病閰?key锛?  - `langsmithReady = true`
   - `langsmithConfigured = false`
 
-- 配好 tracing 和 key：
-  - `langsmithConfigured = true`
+- 閰嶅ソ tracing 鍜?key锛?  - `langsmithConfigured = true`
 
-## 4. 本地运行记录检查
-
-发起一轮 AI 对话后：
+## 4. 鏈湴杩愯璁板綍妫€鏌?
+鍙戣捣涓€杞?AI 瀵硅瘽鍚庯細
 
 - `GET /api/ai/runs/recent`
 
-预期返回最近运行记录，并包含：
+棰勬湡杩斿洖鏈€杩戣繍琛岃褰曪紝骞跺寘鍚細
 
 - `traceId`
 - `runId`
@@ -63,39 +56,33 @@ LANGSMITH_TRACING=false
 - `finishedAt`
 - `status`
 
-同时检查：
+鍚屾椂妫€鏌ワ細
 
 - `backend/data/agent_runs/agent_runs.jsonl`
 
-应追加一条记录。
-
-## 5. 前端页面检查
-
-打开 AI 页，顶部应看到：
+搴旇拷鍔犱竴鏉¤褰曘€?
+## 5. 鍓嶇椤甸潰妫€鏌?
+鎵撳紑 AI 椤碉紝椤堕儴搴旂湅鍒帮細
 
 - `Observability Local`
-- `LangSmith Ready` 或 `LangSmith Configured`
+- `LangSmith Ready` 鎴?`LangSmith Configured`
 
-发起一轮对话后，回答区域应看到：
-
+鍙戣捣涓€杞璇濆悗锛屽洖绛斿尯鍩熷簲鐪嬪埌锛?
 - `Trace ...`
 - `Run ...`
 
-## 6. LangSmith 平台检查
-
-当前提是 `.env` 已配置：
+## 6. LangSmith 骞冲彴妫€鏌?
+褰撳墠鎻愭槸 `.env` 宸查厤缃細
 
 ```env
 LANGSMITH_TRACING=true
 LANGSMITH_API_KEY=...
 ```
 
-重启后端，再发起一轮 AI 对话。
-
-预期在 LangSmith 平台中能看到：
-
+閲嶅惎鍚庣锛屽啀鍙戣捣涓€杞?AI 瀵硅瘽銆?
+棰勬湡鍦?LangSmith 骞冲彴涓兘鐪嬪埌锛?
 - `AgentNews Workflow`
-- 子节点：
+- 瀛愯妭鐐癸細
   - `Query Analysis`
   - `Retrieval Planner`
   - `Local News Retrieval`
@@ -106,18 +93,16 @@ LANGSMITH_API_KEY=...
   - `Answer Verifier`
   - `Response Formatter`
 
-## 7. 降级检查
-
-把 `.env` 改成：
-
+## 7. 闄嶇骇妫€鏌?
+鎶?`.env` 鏀规垚锛?
 ```env
 LANGSMITH_TRACING=false
 ```
 
-重启后端后再次测试：
+閲嶅惎鍚庣鍚庡啀娆℃祴璇曪細
 
-预期：
+棰勬湡锛?
+- AI 鍔熻兘涓嶅彈褰卞搷
+- 鏈湴 run log 浠嶇劧姝ｅ父
+- 鍙槸 LangSmith 骞冲彴涓嶅啀鏂板 trace
 
-- AI 功能不受影响
-- 本地 run log 仍然正常
-- 只是 LangSmith 平台不再新增 trace

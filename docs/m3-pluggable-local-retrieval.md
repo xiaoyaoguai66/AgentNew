@@ -1,172 +1,143 @@
-# M3.6 可插拔本地检索层：为 Qdrant 接入做准备
-
-## 这一阶段为什么要做
-
-到 `M3.5` 为止，新闻助手已经具备：
+﻿# M3.6 鍙彃鎷旀湰鍦版绱㈠眰锛氫负 Qdrant 鎺ュ叆鍋氬噯澶?
+## 杩欎竴闃舵涓轰粈涔堣鍋?
+鍒?`M3.5` 涓烘锛屾柊闂诲姪鎵嬪凡缁忓叿澶囷細
 
 - `Retrieval Planner`
-- 本地新闻 lexical baseline
+- 鏈湴鏂伴椈 lexical baseline
 - Tavily Web Search
 - Query Rewrite
-- Fusion + 轻量 rerank
+- Fusion + 杞婚噺 rerank
 
-但本地检索层还有一个明显问题：
+浣嗘湰鍦版绱㈠眰杩樻湁涓€涓槑鏄鹃棶棰橈細
 
-**当前本地检索只有一套实现，而且入口和实现是绑定在一起的。**
+**褰撳墠鏈湴妫€绱㈠彧鏈変竴濂楀疄鐜帮紝鑰屼笖鍏ュ彛鍜屽疄鐜版槸缁戝畾鍦ㄤ竴璧风殑銆?*
 
-这会带来两个后续问题：
+杩欎細甯︽潵涓や釜鍚庣画闂锛?
+1. 涓€鏃︽帴 `Qdrant`锛屽氨瑕佺洿鎺ユ敼鍐欑幇鏈夋湰鍦版绱富閾捐矾  
+   杩欎細璁?`M3.3 ~ M3.5` 閲屽凡缁忕ǔ瀹氫笅鏉ョ殑 Planner銆丗usion 鍜?AI 涓绘祦绋嬮噸鏂版壙鍙楁敼鍔ㄩ闄┿€?
+2. 闈㈣瘯鏃跺緢闅炬妸鈥滄柟娉曟紨杩涒€濊娓呮  
+   濡傛灉浠ｇ爜閲屽彧鏈変竴涓?`news_retrieval_service.py`锛屽緢闅炬竻鏅拌鏄庯細
+   - 褰撳墠鐢ㄧ殑鏄?lexical baseline
+   - 鍚庨潰鍑嗗鎬庝箞鎺ュ悜閲忔绱?   - 涓轰粈涔堣鍏堝仛 abstraction 鍐嶄笂 Qdrant
 
-1. 一旦接 `Qdrant`，就要直接改写现有本地检索主链路  
-   这会让 `M3.3 ~ M3.5` 里已经稳定下来的 Planner、Fusion 和 AI 主流程重新承受改动风险。
-
-2. 面试时很难把“方法演进”讲清楚  
-   如果代码里只有一个 `news_retrieval_service.py`，很难清晰说明：
-   - 当前用的是 lexical baseline
-   - 后面准备怎么接向量检索
-   - 为什么要先做 abstraction 再上 Qdrant
-
-所以 `M3.6` 的目标不是立刻把向量检索全做完，而是：
-
-**先把本地检索做成可插拔结构，让 lexical baseline 和后续 Qdrant 集成有稳定接口。**
+鎵€浠?`M3.6` 鐨勭洰鏍囦笉鏄珛鍒绘妸鍚戦噺妫€绱㈠叏鍋氬畬锛岃€屾槸锛?
+**鍏堟妸鏈湴妫€绱㈠仛鎴愬彲鎻掓嫈缁撴瀯锛岃 lexical baseline 鍜屽悗缁?Qdrant 闆嗘垚鏈夌ǔ瀹氭帴鍙ｃ€?*
 
 ---
 
-## 这一阶段解决了什么
-
-本次改造后，本地检索层从“单文件实现”升级成了三层结构：
+## 杩欎竴闃舵瑙ｅ喅浜嗕粈涔?
+鏈鏀归€犲悗锛屾湰鍦版绱㈠眰浠庘€滃崟鏂囦欢瀹炵幇鈥濆崌绾ф垚浜嗕笁灞傜粨鏋勶細
 
 1. `lexical_news_retriever.py`
-   - 保留并承接当前可运行的 lexical baseline
+   - 淇濈暀骞舵壙鎺ュ綋鍓嶅彲杩愯鐨?lexical baseline
 
 2. `vector_news_retriever.py`
-   - 作为 Qdrant / vector retrieval 的预留实现入口
-
+   - 浣滀负 Qdrant / vector retrieval 鐨勯鐣欏疄鐜板叆鍙?
 3. `news_retrieval_service.py`
-   - 作为统一的本地检索 façade
-   - 由它决定当前使用哪种本地引擎
+   - 浣滀负缁熶竴鐨勬湰鍦版绱?fa莽ade
+   - 鐢卞畠鍐冲畾褰撳墠浣跨敤鍝鏈湴寮曟搸
 
-这样做以后：
+杩欐牱鍋氫互鍚庯細
 
-- Agent 主链路只依赖 `news_retrieval_service.retrieve_news_sources()`
-- 具体是 lexical 还是后续 vector，不会再泄漏到更上层
-- 后面接 Qdrant 时，主要改动会被限制在本地检索层内部
+- Agent 涓婚摼璺彧渚濊禆 `news_retrieval_service.retrieve_news_sources()`
+- 鍏蜂綋鏄?lexical 杩樻槸鍚庣画 vector锛屼笉浼氬啀娉勬紡鍒版洿涓婂眰
+- 鍚庨潰鎺?Qdrant 鏃讹紝涓昏鏀瑰姩浼氳闄愬埗鍦ㄦ湰鍦版绱㈠眰鍐呴儴
 
 ---
 
-## 本次代码结构变化
+## 鏈浠ｇ爜缁撴瀯鍙樺寲
 
-新增：
-
+鏂板锛?
 - `backend/services/lexical_news_retriever.py`
 - `backend/services/vector_news_retriever.py`
 
-重构：
-
+閲嶆瀯锛?
 - `backend/services/news_retrieval_service.py`
 
-其中职责划分如下：
-
+鍏朵腑鑱岃矗鍒掑垎濡備笅锛?
 ### 1. lexical_news_retriever.py
 
-这里承接了你当前已经验证过的本地检索 baseline：
+杩欓噷鎵挎帴浜嗕綘褰撳墠宸茬粡楠岃瘉杩囩殑鏈湴妫€绱?baseline锛?
+- MySQL 鍊欓€夐泦
+- 绫诲埆杩囨护
+- 鏃堕棿鑼冨洿杩囨护
+- lexical 鎵撳垎
+- snippet 鎶藉彇
 
-- MySQL 候选集
-- 类别过滤
-- 时间范围过滤
-- lexical 打分
-- snippet 抽取
+涔熷氨鏄锛?
+**褰撳墠鐪熸璺戝湪绾夸笂鐨勬湰鍦版绱紝浠嶇劧鏄繖鏉?lexical baseline銆?*
 
-也就是说：
-
-**当前真正跑在线上的本地检索，仍然是这条 lexical baseline。**
-
-这能保证：
-
-- 当前功能不回退
-- 之前的调优逻辑不丢
-- 本地 grounded QA 仍然保持稳定
+杩欒兘淇濊瘉锛?
+- 褰撳墠鍔熻兘涓嶅洖閫€
+- 涔嬪墠鐨勮皟浼橀€昏緫涓嶄涪
+- 鏈湴 grounded QA 浠嶇劧淇濇寔绋冲畾
 
 ### 2. vector_news_retriever.py
 
-这一层现在的定位不是“已经完成向量检索”，而是：
+杩欎竴灞傜幇鍦ㄧ殑瀹氫綅涓嶆槸鈥滃凡缁忓畬鎴愬悜閲忔绱⑩€濓紝鑰屾槸锛?
+**棰勭暀缁熶竴鐨?vector retrieval 鎺ュ彛锛屽苟鎶婅繍琛屾椂鐘舵€佹樉寮忓寲銆?*
 
-**预留统一的 vector retrieval 接口，并把运行时状态显式化。**
-
-当前它会输出：
-
+褰撳墠瀹冧細杈撳嚭锛?
 - `vectorRetrievalEnabled`
 - `vectorStoreConfigured`
 - `vectorBackend`
 - `vectorRetrievalActive`
 
-而真正的向量召回逻辑暂时还没有接入，原因很明确：
+鑰岀湡姝ｇ殑鍚戦噺鍙洖閫昏緫鏆傛椂杩樻病鏈夋帴鍏ワ紝鍘熷洜寰堟槑纭細
 
-- 还没有新闻 chunk embedding 流程
-- 还没有向量索引构建流程
-- 还没有正式的 Qdrant 查询链路
+- 杩樻病鏈夋柊闂?chunk embedding 娴佺▼
+- 杩樻病鏈夊悜閲忕储寮曟瀯寤烘祦绋?- 杩樻病鏈夋寮忕殑 Qdrant 鏌ヨ閾捐矾
 
-所以这一层目前是“vector-ready”，不是“vector-complete”。
+鎵€浠ヨ繖涓€灞傜洰鍓嶆槸鈥渧ector-ready鈥濓紝涓嶆槸鈥渧ector-complete鈥濄€?
+杩欎篃鏄繖涓€姝ヨ璁′笂鏈€閲嶈鐨勫湴鏂癸細
 
-这也是这一步设计上最重要的地方：
-
-**先把接口和状态边界搭好，再把真正的向量检索填进去。**
+**鍏堟妸鎺ュ彛鍜岀姸鎬佽竟鐣屾惌濂斤紝鍐嶆妸鐪熸鐨勫悜閲忔绱㈠～杩涘幓銆?*
 
 ### 3. news_retrieval_service.py
 
-这一层现在变成了本地检索总入口。
+杩欎竴灞傜幇鍦ㄥ彉鎴愪簡鏈湴妫€绱㈡€诲叆鍙ｃ€?
+瀹冭礋璐ｏ細
 
-它负责：
-
-- 解析当前本地检索引擎配置
-- 统一输出本地检索运行时状态
-- 默认走 lexical baseline
-- 在 `hybrid-ready` 模式下，为后续向量检索融合预留路径
-
-当前支持的本地引擎配置：
+- 瑙ｆ瀽褰撳墠鏈湴妫€绱㈠紩鎿庨厤缃?- 缁熶竴杈撳嚭鏈湴妫€绱㈣繍琛屾椂鐘舵€?- 榛樿璧?lexical baseline
+- 鍦?`hybrid-ready` 妯″紡涓嬶紝涓哄悗缁悜閲忔绱㈣瀺鍚堥鐣欒矾寰?
+褰撳墠鏀寔鐨勬湰鍦板紩鎿庨厤缃細
 
 - `LOCAL_RETRIEVAL_ENGINE=lexical`
 - `LOCAL_RETRIEVAL_ENGINE=hybrid-ready`
 
-含义是：
+鍚箟鏄細
 
 - `lexical`
-  - 只用当前已稳定的 lexical baseline
+  - 鍙敤褰撳墠宸茬ǔ瀹氱殑 lexical baseline
 
 - `hybrid-ready`
-  - 保持 lexical 可用
-  - 同时打开“未来可以并入 vector sources”的代码结构
+  - 淇濇寔 lexical 鍙敤
+  - 鍚屾椂鎵撳紑鈥滄湭鏉ュ彲浠ュ苟鍏?vector sources鈥濈殑浠ｇ爜缁撴瀯
 
 ---
 
-## 为什么这一步不直接把 Qdrant 全接完
+## 涓轰粈涔堣繖涓€姝ヤ笉鐩存帴鎶?Qdrant 鍏ㄦ帴瀹?
+鍘熷洜涓嶆槸鈥滀笉鑳藉仛鈥濓紝鑰屾槸鈥滅幇鍦ㄨ繖鏍锋洿鍚堢悊鈥濄€?
+Qdrant 鐪熸鎺ュ叆鑷冲皯杩橀渶瑕佽ˉ榻愪笅闈㈠嚑灞傦細
 
-原因不是“不能做”，而是“现在这样更合理”。
+1. 鏂伴椈鍒?chunk
+2. embedding 鐢熸垚
+3. 寤虹储寮?/ upsert
+4. metadata 璁捐
+5. 鏌ヨ鎺ュ彛
+6. 鍚戦噺鍙洖缁撴灉鍜屽綋鍓?lexical 缁撴灉鐨勬湰鍦拌瀺鍚?
+濡傛灉杩欎簺杩樻病鍑嗗濂斤紝灏辩洿鎺ユ妸 Qdrant 寮烘帴杩涘綋鍓嶄富閾捐矾锛屼細鍑虹幇涓や釜闂锛?
+- 浠ｇ爜閲屼細鍏呮弧鍗婃垚鍝侀€昏緫
+- 闈㈣瘯鏃朵篃寰堥毦璇存竻妤氣€滃綋鍓嶅埌搴曟帴鍒颁簡鍝竴姝モ€?
+鍥犳杩欎竴姝ョ殑宸ョ▼绛栫暐鏄細
 
-Qdrant 真正接入至少还需要补齐下面几层：
+**鍏堟妸缁撴瀯鎶借薄鍒颁綅锛屽啀璁?Qdrant 鐪熸鎺ュ叆銆?*
 
-1. 新闻切 chunk
-2. embedding 生成
-3. 建索引 / upsert
-4. metadata 设计
-5. 查询接口
-6. 向量召回结果和当前 lexical 结果的本地融合
-
-如果这些还没准备好，就直接把 Qdrant 强接进当前主链路，会出现两个问题：
-
-- 代码里会充满半成品逻辑
-- 面试时也很难说清楚“当前到底接到了哪一步”
-
-因此这一步的工程策略是：
-
-**先把结构抽象到位，再让 Qdrant 真正接入。**
-
-这比把一个“还没建立 embedding/index pipeline”的向量库硬塞进主流程更稳。
-
+杩欐瘮鎶婁竴涓€滆繕娌″缓绔?embedding/index pipeline鈥濈殑鍚戦噺搴撶‖濉炶繘涓绘祦绋嬫洿绋炽€?
 ---
 
-## 配置层也一起准备好了
-
-这次还把后续 Qdrant 和 embedding 相关配置补进了：
+## 閰嶇疆灞備篃涓€璧峰噯澶囧ソ浜?
+杩欐杩樻妸鍚庣画 Qdrant 鍜?embedding 鐩稿叧閰嶇疆琛ヨ繘浜嗭細
 
 - `LOCAL_RETRIEVAL_ENGINE`
 - `ENABLE_VECTOR_RETRIEVAL`
@@ -178,98 +149,79 @@ Qdrant 真正接入至少还需要补齐下面几层：
 - `EMBEDDING_API_KEY`
 - `EMBEDDING_MODEL`
 
-这些配置现在已经进入：
-
+杩欎簺閰嶇疆鐜板湪宸茬粡杩涘叆锛?
 - `backend/config/settings.py`
 - `.env.example`
 
-意义在于：
+鎰忎箟鍦ㄤ簬锛?
+1. 鍚庨潰鎺?Qdrant 鏃朵笉闇€瑕佸啀閲嶆瀯閰嶇疆绯荤粺
+2. 杩愯鏃剁姸鎬佽兘澶熸槑纭煡閬擄細
+   - 鏈夋病鏈夋墦寮€鍚戦噺妫€绱㈠紑鍏?   - Qdrant 鏄惁宸查厤缃?   - 褰撳墠鏄笉鏄彧鏄?`reserved / ready` 鐘舵€?
+---
 
-1. 后面接 Qdrant 时不需要再重构配置系统
-2. 运行时状态能够明确知道：
-   - 有没有打开向量检索开关
-   - Qdrant 是否已配置
-   - 当前是不是只是 `reserved / ready` 状态
+## 鍓嶇涓轰粈涔堜篃瑕佹樉绀鸿繖浜涚姸鎬?
+杩欐鎴戣繕鎶婅繍琛屾椂鐘舵€侀€忓埌浜?`/api/ai/status`锛屽苟鍦?AI 椤靛姞浜嗕袱涓柊鐘舵€侊細
+
+- `鏈湴寮曟搸`
+- `鍚戦噺`
+
+杩欎欢浜嬬湅璧锋潵鍍忊€滆皟璇?UI鈥濓紝浣嗗叾瀹炲椤圭洰寰堥噸瑕併€?
+鍘熷洜鏄細
+
+1. 浣犺嚜宸辫皟璇曟椂鑳界珛鍒荤湅鍒板綋鍓嶆槸涓嶆槸杩樺湪 lexical baseline
+2. 鍚庨潰鎺?Qdrant 鍚庯紝椤甸潰涓婅兘鐩存帴浣撶幇鈥滃綋鍓嶅凡缁忓垏鍒颁簡 vector-ready / vector-active鈥?3. 闈㈣瘯鏃跺彲浠ョ洿鎺ュ睍绀猴細杩欎釜绯荤粺涓嶆槸闈欐€佸啓姝伙紝鑰屾槸鑳借瀵熷綋鍓嶆绱㈡爤鐘舵€?
+---
+
+## 杩欎竴姝ュ湪鏂规硶婕旇繘閲岀殑鎰忎箟
+
+杩欎竴姝ラ潪甯搁€傚悎浣犲悗闈㈠湪闈㈣瘯閲岃В閲婏細
+
+鈥滄垜娌℃湁鍦?lexical baseline 杩樻病绋冲畾鐨勬椂鍊欏氨鐩存帴寮轰笂鍚戦噺搴擄紝鑰屾槸鍏堟妸鏈湴妫€绱㈠眰鍋氭垚鍙彃鎷旂粨鏋勩€傝繖鏍峰綋鍓嶇郴缁熺户缁ǔ瀹氳繍琛岋紝鍚庣画鎺?Qdrant 鍙渶瑕佸湪 retriever 灞傚唴閮ㄨˉ chunk銆乪mbedding 鍜屽悜閲忔煡璇紝涓嶉渶瑕佹妸 Planner銆丗usion 鍜?grounded answer 鍏ㄩ儴閲嶅啓銆傗€?
+
+杩欏彞璇濈殑浠峰€煎緢楂橈紝鍥犱负瀹冧綋鐜扮殑鏄細
+
+- 缁撴瀯婕旇繘鎰忚瘑
+- 鍙淮鎶ゆ€ф剰璇?- 瀵逛腑闂存€佹柟妗堢殑宸ョ▼鎺у埗
 
 ---
 
-## 前端为什么也要显示这些状态
+## 褰撳墠鐘舵€佽璇村噯纭?
+杩欎竴闃舵瀹屾垚鍚庯紝鏈€鍑嗙‘鐨勬弿杩版槸锛?
+- 褰撳墠绾夸笂鏈湴妫€绱㈠紩鎿庯細`lexical baseline`
+- 褰撳墠绯荤粺缁撴瀯锛歚vector-ready`
+- 褰撳墠鍚戦噺妫€绱㈢姸鎬侊細`鎺ュ彛鍜岄厤缃凡棰勭暀锛屼絾 Qdrant + embedding pipeline 杩樻病姝ｅ紡鎺ュ叆`
 
-这次我还把运行时状态透到了 `/api/ai/status`，并在 AI 页加了两个新状态：
+涓嶈鎶婅繖涓€姝ヨ鎴愨€滃凡缁忓畬鎴愪簡鍚戦噺妫€绱⑩€濓紝閭ｆ牱浼氬湪闈㈣瘯閲岃闂┛銆?
+姝ｇ‘璇存硶搴旇鏄細
 
-- `本地引擎`
-- `向量`
-
-这件事看起来像“调试 UI”，但其实对项目很重要。
-
-原因是：
-
-1. 你自己调试时能立刻看到当前是不是还在 lexical baseline
-2. 后面接 Qdrant 后，页面上能直接体现“当前已经切到了 vector-ready / vector-active”
-3. 面试时可以直接展示：这个系统不是静态写死，而是能观察当前检索栈状态
+**鈥滄垜鍏堟妸鏈湴妫€绱㈠眰鍋氭垚浜嗗彲鎻掓嫈鏋舵瀯锛屼繚鎸?lexical baseline 鎸佺画鍙敤锛屽悓鏃朵负 Qdrant 鎺ュ叆棰勭暀浜嗙嫭绔?vector retriever 鍜岃繍琛屾椂閰嶇疆銆傗€?*
 
 ---
 
-## 这一步在方法演进里的意义
+## 鎵嬪姩娴嬭瘯寤鸿
 
-这一步非常适合你后面在面试里解释：
-
-“我没有在 lexical baseline 还没稳定的时候就直接强上向量库，而是先把本地检索层做成可插拔结构。这样当前系统继续稳定运行，后续接 Qdrant 只需要在 retriever 层内部补 chunk、embedding 和向量查询，不需要把 Planner、Fusion 和 grounded answer 全部重写。” 
-
-这句话的价值很高，因为它体现的是：
-
-- 结构演进意识
-- 可维护性意识
-- 对中间态方案的工程控制
-
----
-
-## 当前状态要说准确
-
-这一阶段完成后，最准确的描述是：
-
-- 当前线上本地检索引擎：`lexical baseline`
-- 当前系统结构：`vector-ready`
-- 当前向量检索状态：`接口和配置已预留，但 Qdrant + embedding pipeline 还没正式接入`
-
-不要把这一步说成“已经完成了向量检索”，那样会在面试里被问穿。
-
-正确说法应该是：
-
-**“我先把本地检索层做成了可插拔架构，保持 lexical baseline 持续可用，同时为 Qdrant 接入预留了独立 vector retriever 和运行时配置。”**
-
----
-
-## 手动测试建议
-
-你现在可以这样验证这一阶段：
-
-1. 正常启动前后端
-2. 打开 AI 页
-3. 查看顶部状态：
-   - `本地引擎` 默认应显示 `lexical-baseline`
-   - `向量` 默认应显示 `未开启`
-4. 如果你在 `.env` 里设置：
+浣犵幇鍦ㄥ彲浠ヨ繖鏍烽獙璇佽繖涓€闃舵锛?
+1. 姝ｅ父鍚姩鍓嶅悗绔?2. 鎵撳紑 AI 椤?3. 鏌ョ湅椤堕儴鐘舵€侊細
+   - `鏈湴寮曟搸` 榛樿搴旀樉绀?`lexical-baseline`
+   - `鍚戦噺` 榛樿搴旀樉绀?`鏈紑鍚痐
+4. 濡傛灉浣犲湪 `.env` 閲岃缃細
    - `LOCAL_RETRIEVAL_ENGINE=hybrid-ready`
    - `ENABLE_VECTOR_RETRIEVAL=true`
-   - 但不配置 `QDRANT_URL`
-   那前端应显示：
-   - `本地引擎` 变成 `lexical-plus-vector-ready`
-   - `向量` 变成 `开关已开，索引未配`
-5. 在这两种模式下继续提问，当前回答能力不应回退，因为 lexical baseline 仍然是默认主链路
+   - 浣嗕笉閰嶇疆 `QDRANT_URL`
+   閭ｅ墠绔簲鏄剧ず锛?   - `鏈湴寮曟搸` 鍙樻垚 `lexical-plus-vector-ready`
+   - `鍚戦噺` 鍙樻垚 `寮€鍏冲凡寮€锛岀储寮曟湭閰峘
+5. 鍦ㄨ繖涓ょ妯″紡涓嬬户缁彁闂紝褰撳墠鍥炵瓟鑳藉姏涓嶅簲鍥為€€锛屽洜涓?lexical baseline 浠嶇劧鏄粯璁や富閾捐矾
 
 ---
 
-## 下一步怎么接 Qdrant
+## 涓嬩竴姝ユ€庝箞鎺?Qdrant
 
-有了这一层 abstraction，下一步就可以正式推进：
+鏈変簡杩欎竴灞?abstraction锛屼笅涓€姝ュ氨鍙互姝ｅ紡鎺ㄨ繘锛?
+1. 鏂伴椈 chunk 璁捐
+2. embedding 鐢熸垚閾捐矾
+3. Qdrant upsert / 绱㈠紩鍒濆鍖?4. metadata filter
+5. vector retrieval 鍜?lexical retrieval 鐨勬湰鍦版贩鍚堝彫鍥?
+涔熷氨鏄锛屼粠杩欎竴闃舵寮€濮嬶紝鍚庣画鐨?Qdrant 鎺ュ叆缁堜簬鑳藉彉鎴愶細
 
-1. 新闻 chunk 设计
-2. embedding 生成链路
-3. Qdrant upsert / 索引初始化
-4. metadata filter
-5. vector retrieval 和 lexical retrieval 的本地混合召回
+**鍦ㄧǔ瀹氭帴鍙ｉ噷濉疄鐜帮紝鑰屼笉鏄帹缈荤幇鏈夌粨鏋勩€?*
 
-也就是说，从这一阶段开始，后续的 Qdrant 接入终于能变成：
-
-**在稳定接口里填实现，而不是推翻现有结构。**

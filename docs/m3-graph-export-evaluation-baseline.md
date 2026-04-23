@@ -1,49 +1,42 @@
-# M3.17 Workflow Graph Export And Evaluation Baseline
+﻿# M3.17 Workflow Graph Export And Evaluation Baseline
 
-## 本次做了什么
-
-这一阶段补了两类能力：
-
+## 鏈鍋氫簡浠€涔?
+杩欎竴闃舵琛ヤ簡涓ょ被鑳藉姏锛?
 1. `Workflow Graph Export`
 2. `Evaluation Baseline`
 
-前者解决“工作流图到底怎么展示”，后者解决“这套 query analysis / planner 怎么验证不是拍脑袋”。
-
-新增接口：
-
+鍓嶈€呰В鍐斥€滃伐浣滄祦鍥惧埌搴曟€庝箞灞曠ず鈥濓紝鍚庤€呰В鍐斥€滆繖濂?query analysis / planner 鎬庝箞楠岃瘉涓嶆槸鎷嶈剳琚嬧€濄€?
+鏂板鎺ュ彛锛?
 - `GET /api/ai/workflow/graph`
 - `GET /api/ai/eval/dataset`
 - `POST /api/ai/eval/run`
 
-## 为什么要做 Workflow Graph Export
+## 涓轰粈涔堣鍋?Workflow Graph Export
 
-你前面提到一个很关键的问题：
+浣犲墠闈㈡彁鍒颁竴涓緢鍏抽敭鐨勯棶棰橈細
 
-> 之前好像能在 studio 里看到图
+> 涔嬪墠濂藉儚鑳藉湪 studio 閲岀湅鍒板浘
 
-这个记忆本身没有问题。  
-只是要分清楚：
+杩欎釜璁板繂鏈韩娌℃湁闂銆? 
+鍙槸瑕佸垎娓呮锛?
+- `LangSmith` 鏇村亸 tracing / evaluation / run 瑙傚療
+- `LangGraph Studio` 鎴?graph 瑙嗗浘鏇村亸 workflow 缁撴瀯灞曠ず
 
-- `LangSmith` 更偏 tracing / evaluation / run 观察
-- `LangGraph Studio` 或 graph 视图更偏 workflow 结构展示
-
-为了让项目自己也能直接导出图结构，这一阶段我补了 `workflow graph export`。
-
-现在后端会返回：
+涓轰簡璁╅」鐩嚜宸变篃鑳界洿鎺ュ鍑哄浘缁撴瀯锛岃繖涓€闃舵鎴戣ˉ浜?`workflow graph export`銆?
+鐜板湪鍚庣浼氳繑鍥烇細
 
 - `nodes`
 - `edges`
 - `mermaid`
 
-这样就算不依赖 Studio，也可以：
+杩欐牱灏辩畻涓嶄緷璧?Studio锛屼篃鍙互锛?
+- 鍦ㄦ帴鍙ｉ噷鐩存帴鐪嬪浘缁撴瀯
+- 鎶?Mermaid 鏀捐繘 GitHub README
+- 鍦ㄩ潰璇曟椂鏄庣‘灞曠ず鑺傜偣鍜岃竟
 
-- 在接口里直接看图结构
-- 把 Mermaid 放进 GitHub README
-- 在面试时明确展示节点和边
+## 涓轰粈涔堣鍏堝仛 Evaluation Baseline
 
-## 为什么要先做 Evaluation Baseline
-
-当前新闻 Agent 已经有很多环节：
+褰撳墠鏂伴椈 Agent 宸茬粡鏈夊緢澶氱幆鑺傦細
 
 - Query Analysis
 - Retrieval Planner
@@ -53,45 +46,34 @@
 - Verifier
 - Formatter
 
-但如果没有评测，你很难系统回答这些问题：
+浣嗗鏋滄病鏈夎瘎娴嬶紝浣犲緢闅剧郴缁熷洖绛旇繖浜涢棶棰橈細
 
-- Planner 分得准不准
-- Query Analysis 的 intent 判断稳不稳
-- freshness / scope 这些字段是不是合理
-
-所以这一阶段先做了一个**结构化本地评测基线**，优先评测：
+- Planner 鍒嗗緱鍑嗕笉鍑?- Query Analysis 鐨?intent 鍒ゆ柇绋充笉绋?- freshness / scope 杩欎簺瀛楁鏄笉鏄悎鐞?
+鎵€浠ヨ繖涓€闃舵鍏堝仛浜嗕竴涓?*缁撴瀯鍖栨湰鍦拌瘎娴嬪熀绾?*锛屼紭鍏堣瘎娴嬶細
 
 - `expectedPlan`
 - `expectedIntent`
 - `expectedFreshness`
 - `expectedScope`
 
-这是一种非常适合中期项目的做法，因为它：
+杩欐槸涓€绉嶉潪甯搁€傚悎涓湡椤圭洰鐨勫仛娉曪紝鍥犱负瀹冿細
 
-- 不依赖大模型输出稳定性
-- 不依赖联网结果波动
-- 可以先验证检索前链路是否合理
+- 涓嶄緷璧栧ぇ妯″瀷杈撳嚭绋冲畾鎬?- 涓嶄緷璧栬仈缃戠粨鏋滄尝鍔?- 鍙互鍏堥獙璇佹绱㈠墠閾捐矾鏄惁鍚堢悊
 
-也就是先把“前半段工作流”评稳，再继续做“完整问答效果评测”。
-
-## 技术含义
-
+涔熷氨鏄厛鎶娾€滃墠鍗婃宸ヤ綔娴佲€濊瘎绋筹紝鍐嶇户缁仛鈥滃畬鏁撮棶绛旀晥鏋滆瘎娴嬧€濄€?
+## 鎶€鏈惈涔?
 ### 1. Workflow Graph Export
 
-它的作用是把工作流从“代码里的图”变成“可观察的图”。
+瀹冪殑浣滅敤鏄妸宸ヤ綔娴佷粠鈥滀唬鐮侀噷鐨勫浘鈥濆彉鎴愨€滃彲瑙傚療鐨勫浘鈥濄€?
+褰撳墠浼氬鍑轰笁绉嶄俊鎭細
 
-当前会导出三种信息：
-
-- `nodes`：节点列表
-- `edges`：节点之间的边
-- `mermaid`：可直接复制到 Markdown 的流程图文本
+- `nodes`锛氳妭鐐瑰垪琛?- `edges`锛氳妭鐐逛箣闂寸殑杈?- `mermaid`锛氬彲鐩存帴澶嶅埗鍒?Markdown 鐨勬祦绋嬪浘鏂囨湰
 
 ### 2. Evaluation Dataset
 
-这不是训练集，而是**评测集**。  
-也就是一组带预期标签的问题样本，用来检验系统行为。
-
-当前评测集字段包括：
+杩欎笉鏄缁冮泦锛岃€屾槸**璇勬祴闆?*銆? 
+涔熷氨鏄竴缁勫甫棰勬湡鏍囩鐨勯棶棰樻牱鏈紝鐢ㄦ潵妫€楠岀郴缁熻涓恒€?
+褰撳墠璇勬祴闆嗗瓧娈靛寘鎷細
 
 - `question`
 - `mode`
@@ -104,35 +86,30 @@
 
 ### 3. Evaluation Baseline
 
-这里的 baseline 不是“最终模型能力”，而是“当前阶段最先要稳定的评测基线”。
-
-因为如果 Query Analysis 和 Planner 本身就不稳定，后面再接：
+杩欓噷鐨?baseline 涓嶆槸鈥滄渶缁堟ā鍨嬭兘鍔涒€濓紝鑰屾槸鈥滃綋鍓嶉樁娈垫渶鍏堣绋冲畾鐨勮瘎娴嬪熀绾库€濄€?
+鍥犱负濡傛灉 Query Analysis 鍜?Planner 鏈韩灏变笉绋冲畾锛屽悗闈㈠啀鎺ワ細
 
 - rerank
 - verifier
 - full answer evaluation
 
-也会越来越难解释。
-
-## 本次实现原理
+涔熶細瓒婃潵瓒婇毦瑙ｉ噴銆?
+## 鏈瀹炵幇鍘熺悊
 
 ### 1. Graph Export
 
-如果当前引擎是 `langgraph`：
+濡傛灉褰撳墠寮曟搸鏄?`langgraph`锛?
+- 鐩存帴璇诲彇 `CompiledStateGraph`
+- 鎷垮埌 graph 鍐呴儴鐨?`nodes / edges`
+- 鍐嶅鍑烘垚 Mermaid
 
-- 直接读取 `CompiledStateGraph`
-- 拿到 graph 内部的 `nodes / edges`
-- 再导出成 Mermaid
+濡傛灉褰撳墠寮曟搸鏄?`legacy`锛?
+- 鐢ㄩ潤鎬佽妭鐐瑰畾涔夎ˉ涓€浠藉吋瀹瑰浘
 
-如果当前引擎是 `legacy`：
-
-- 用静态节点定义补一份兼容图
-
-所以这套接口既能支持现在的 `LangGraph`，也能兼容回退模式。
-
+鎵€浠ヨ繖濂楁帴鍙ｆ棦鑳芥敮鎸佺幇鍦ㄧ殑 `LangGraph`锛屼篃鑳藉吋瀹瑰洖閫€妯″紡銆?
 ### 2. Evaluation Baseline
 
-评测流程是：
+璇勬祴娴佺▼鏄細
 
 ```text
 load eval dataset
@@ -142,23 +119,18 @@ load eval dataset
 -> compute planner / intent / freshness / scope accuracy
 ```
 
-这一步还没有去评测：
+杩欎竴姝ヨ繕娌℃湁鍘昏瘎娴嬶細
 
-- 最终回答文本是否完美
-- Web 结果是否总是最优
-- LLM 的生成质量
+- 鏈€缁堝洖绛旀枃鏈槸鍚﹀畬缇?- Web 缁撴灉鏄惁鎬绘槸鏈€浼?- LLM 鐨勭敓鎴愯川閲?
+杩欐槸鏈夋剰鎺у埗鑼冨洿锛屽洜涓鸿繖涓€闃舵鍏堣鎶?*缁撴瀯鍖栧伐浣滄祦鍓嶅崐娈?*璇勭ǔ銆?
+## 濡備綍娴嬭瘯
 
-这是有意控制范围，因为这一阶段先要把**结构化工作流前半段**评稳。
+### 1. 宸ヤ綔娴佸浘
 
-## 如何测试
-
-### 1. 工作流图
-
-访问：
-
+璁块棶锛?
 - `GET /api/ai/workflow/graph`
 
-重点看：
+閲嶇偣鐪嬶細
 
 - `engine`
 - `style`
@@ -167,44 +139,35 @@ load eval dataset
 - `edges`
 - `mermaid`
 
-如果当前是 LangGraph 模式，预期：
+濡傛灉褰撳墠鏄?LangGraph 妯″紡锛岄鏈燂細
 
 - `engine = "langgraph"`
 - `style = "langgraph-stategraph"`
 - `graphVisualizationReady = true`
 
-### 2. 评测集
-
-访问：
-
+### 2. 璇勬祴闆?
+璁块棶锛?
 - `GET /api/ai/eval/dataset`
 
-应能看到内置测试样本。
-
-### 3. 跑评测
-
-请求：
-
+搴旇兘鐪嬪埌鍐呯疆娴嬭瘯鏍锋湰銆?
+### 3. 璺戣瘎娴?
+璇锋眰锛?
 - `POST /api/ai/eval/run`
 
-示例 body：
-
+绀轰緥 body锛?
 ```json
 {
   "limit": 6
 }
 ```
 
-返回里重点看：
-
+杩斿洖閲岄噸鐐圭湅锛?
 - `plannerAccuracy`
 - `intentAccuracy`
 - `freshnessAccuracy`
 - `scopeAccuracy`
 - `results`
 
-## 面试怎么讲
-
-推荐表述：
-
-> 在工作流搭起来之后，我没有直接停在“能跑”，而是继续做了两件事。第一是把 LangGraph 工作流导出成结构化 graph 和 Mermaid，方便在项目文档和 GitHub 里展示节点与边；第二是先构建了一个结构化评测基线，优先验证 Query Analysis 和 Retrieval Planner 的行为是否符合预期。这样后面再做完整问答评测和 LangSmith evaluation 时，链路会更容易解释。
+## 闈㈣瘯鎬庝箞璁?
+鎺ㄨ崘琛ㄨ堪锛?
+> 鍦ㄥ伐浣滄祦鎼捣鏉ヤ箣鍚庯紝鎴戞病鏈夌洿鎺ュ仠鍦ㄢ€滆兘璺戔€濓紝鑰屾槸缁х画鍋氫簡涓や欢浜嬨€傜涓€鏄妸 LangGraph 宸ヤ綔娴佸鍑烘垚缁撴瀯鍖?graph 鍜?Mermaid锛屾柟渚垮湪椤圭洰鏂囨。鍜?GitHub 閲屽睍绀鸿妭鐐逛笌杈癸紱绗簩鏄厛鏋勫缓浜嗕竴涓粨鏋勫寲璇勬祴鍩虹嚎锛屼紭鍏堥獙璇?Query Analysis 鍜?Retrieval Planner 鐨勮涓烘槸鍚︾鍚堥鏈熴€傝繖鏍峰悗闈㈠啀鍋氬畬鏁撮棶绛旇瘎娴嬪拰 LangSmith evaluation 鏃讹紝閾捐矾浼氭洿瀹规槗瑙ｉ噴銆?

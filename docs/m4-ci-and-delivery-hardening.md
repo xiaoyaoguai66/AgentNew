@@ -1,97 +1,73 @@
-# M4 CI 与交付层加固
+﻿# M4 CI 涓庝氦浠樺眰鍔犲浐
 
-## 1. 这一轮做了什么
+## 1. 杩欎竴杞仛浜嗕粈涔?
+杩欎竴杞病鏈夌户缁彔 Agent 鍔熻兘锛岃€屾槸鎶婇」鐩線鈥滃彲浜や粯銆佸彲鍗忎綔銆佸彲鏀惧埌 GitHub鈥濇柟鍚戞帹杩涗簡涓€灞傦細
 
-这一轮没有继续叠 Agent 功能，而是把项目往“可交付、可协作、可放到 GitHub”方向推进了一层：
+- 娓呯悊榛樿妯℃澘鏂囦欢鍜岃繍琛屼骇鐗?- 瀹屽杽 `.gitignore` 涓?`.dockerignore`
+- 澧炲姞 `README.md`
+- 澧炲姞鏋舵瀯鎬昏鍜屾枃妗ｇ储寮?- 澧炲姞 `Dockerfile + docker-compose.yml`
+- 澧炲姞鍩虹 GitHub Actions CI
+- 澧炲姞 `/health` 鍋ュ悍妫€鏌ユ帴鍙?
+## 2. 涓轰粈涔堣繖涓€姝ラ噸瑕?
+鍒拌繖涓樁娈碉紝椤圭洰鐨勬牳蹇冭兘鍔涘凡缁忔瘮杈冨畬鏁淬€傚啀缁х画鍙姞鍔熻兘锛屾敹鐩婁細瓒婃潵瓒婂皬锛涗絾濡傛灉娌℃湁浜や粯灞傦紝闈㈣瘯鍜?GitHub 灞曠ず鏃朵細鍑虹幇涓や釜闂锛?
+1. 椤圭洰鈥滆兘璁测€濓紝浣嗕笉澶熷儚姝ｅ紡宸ョ▼椤圭洰
+2. 浠ｇ爜涓€鏃︾户缁凯浠ｏ紝灏辩己灏戞渶鍩虹鐨勮嚜鍔ㄩ獙璇?
+鎵€浠ヨ繖涓€姝ョ殑閲嶇偣涓嶆槸鏂板涓氬姟鑳藉姏锛岃€屾槸鎻愰珮宸ョ▼瀹屾垚搴︺€?
+## 3. 鏂板鐨勪氦浠樺眰鍐呭
 
-- 清理默认模板文件和运行产物
-- 完善 `.gitignore` 与 `.dockerignore`
-- 增加 `README.md`
-- 增加架构总览和文档索引
-- 增加 `Dockerfile + docker-compose.yml`
-- 增加基础 GitHub Actions CI
-- 增加 `/health` 健康检查接口
+### Docker 鍖?
+鏂板鏂囦欢锛?
+- [docker-compose.yml](../docker-compose.yml)
+- [backend/Dockerfile](../backend/Dockerfile)
+- [frontend/Dockerfile](../frontend/Dockerfile)
+- [frontend/nginx.conf](../frontend/nginx.conf)
 
-## 2. 为什么这一步重要
+褰撳墠鏂规鐨勫畾浣嶆槸锛?
+- MySQL 鍜?Redis 鐙珛瀹瑰櫒
+- Backend 鐙珛瀹瑰櫒
+- Frontend 闈欐€佹瀯寤哄悗鐢?Nginx 鎵樼
+- Qdrant 褰撳墠浠嶈蛋 backend 鍐呴儴 local persistent mode
 
-到这个阶段，项目的核心能力已经比较完整。再继续只加功能，收益会越来越小；但如果没有交付层，面试和 GitHub 展示时会出现两个问题：
-
-1. 项目“能讲”，但不够像正式工程项目
-2. 代码一旦继续迭代，就缺少最基础的自动验证
-
-所以这一步的重点不是新增业务能力，而是提高工程完成度。
-
-## 3. 新增的交付层内容
-
-### Docker 化
-
-新增文件：
-
-- [docker-compose.yml](D:/Code/Fastapi/AgentNews/docker-compose.yml)
-- [backend/Dockerfile](D:/Code/Fastapi/AgentNews/backend/Dockerfile)
-- [frontend/Dockerfile](D:/Code/Fastapi/AgentNews/frontend/Dockerfile)
-- [frontend/nginx.conf](D:/Code/Fastapi/AgentNews/frontend/nginx.conf)
-
-当前方案的定位是：
-
-- MySQL 和 Redis 独立容器
-- Backend 独立容器
-- Frontend 静态构建后由 Nginx 托管
-- Qdrant 当前仍走 backend 内部 local persistent mode
-
-这样做的原因：
-
-- 现在最重要的是把检索架构跑通，而不是先把 Qdrant 服务化部署做复杂
-- 本地 Qdrant 模式更利于单机开发和演示
-- 后面如果切到独立 Qdrant 服务，改的是部署形态，不是整体检索架构
-
-### 健康检查
-
-新增接口：
-
+杩欐牱鍋氱殑鍘熷洜锛?
+- 鐜板湪鏈€閲嶈鐨勬槸鎶婃绱㈡灦鏋勮窇閫氾紝鑰屼笉鏄厛鎶?Qdrant 鏈嶅姟鍖栭儴缃插仛澶嶆潅
+- 鏈湴 Qdrant 妯″紡鏇村埄浜庡崟鏈哄紑鍙戝拰婕旂ず
+- 鍚庨潰濡傛灉鍒囧埌鐙珛 Qdrant 鏈嶅姟锛屾敼鐨勬槸閮ㄧ讲褰㈡€侊紝涓嶆槸鏁翠綋妫€绱㈡灦鏋?
+### 鍋ュ悍妫€鏌?
+鏂板鎺ュ彛锛?
 - `GET /health`
 
-意义：
-
-- 让部署后能快速判断服务是否启动成功
-- 为后续容器编排、CI smoke check 和可观测性预留入口
-
+鎰忎箟锛?
+- 璁╅儴缃插悗鑳藉揩閫熷垽鏂湇鍔℃槸鍚﹀惎鍔ㄦ垚鍔?- 涓哄悗缁鍣ㄧ紪鎺掋€丆I smoke check 鍜屽彲瑙傛祴鎬ч鐣欏叆鍙?
 ### GitHub Actions CI
 
-新增文件：
+鏂板鏂囦欢锛?
+- [.github/workflows/ci.yml](../.github/workflows/ci.yml)
 
-- [.github/workflows/ci.yml](D:/Code/Fastapi/AgentNews/.github/workflows/ci.yml)
+褰撳墠 CI 鍋氱殑鏄渶鍩虹浣嗘渶鏈変环鍊肩殑鍑犱欢浜嬶細
 
-当前 CI 做的是最基础但最有价值的几件事：
-
-- 后端依赖安装 + targeted compile + app import
+- 鍚庣渚濊禆瀹夎 + targeted compile + app import
 - backend smoke
 - backend integration
 - frontend build
 
-这还不是完整测试体系，但已经能挡住最常见的回归：
+杩欒繕涓嶆槸瀹屾暣娴嬭瘯浣撶郴锛屼絾宸茬粡鑳芥尅浣忔渶甯歌鐨勫洖褰掞細
 
-- 后端语法错误
-- FastAPI 应用导入错误
-- 前端打包失败
-- 会话主链路回归
+- 鍚庣璇硶閿欒
+- FastAPI 搴旂敤瀵煎叆閿欒
+- 鍓嶇鎵撳寘澶辫触
+- 浼氳瘽涓婚摼璺洖褰?
+## 4. 浠撳簱娓呯悊
 
-## 4. 仓库清理
+杩欎竴灞傝繕娓呯悊浜嗭細
 
-这一层还清理了：
+- 榛樿 Vite 妯℃澘娈嬬暀鏂囦欢
+- `.cursor / .idea / __pycache__ / debug log / 鏈湴 qdrant 绱㈠紩 / eval jsonl`
 
-- 默认 Vite 模板残留文件
-- `.cursor / .idea / __pycache__ / debug log / 本地 qdrant 索引 / eval jsonl`
+杩欎簺鍐呭鏈湴寮€鍙戝彲鑳戒細閲嶆柊鐢熸垚锛屼絾鐜板湪宸茬粡閫氳繃 ignore 瑙勫垯鏀跺彛锛屼笉浼氱户缁薄鏌撲粨搴撱€?
+## 5. 鍜屾暣浣撹鍒掔殑鍏崇郴
 
-这些内容本地开发可能会重新生成，但现在已经通过 ignore 规则收口，不会继续污染仓库。
-
-## 5. 和整体计划的关系
-
-这一层属于最初路线图里的 `M4 工程化收尾`。  
-它不是“主功能实现”的一部分，而是把项目从“研究型作品”往“企业化交付作品”推进的关键步骤。
-
-## 6. 面试里怎么讲
-
-可以这样概括：
-
-核心功能完成后，我没有停在“能跑”，而是继续补了交付层，包括 Docker Compose、健康检查、README、架构总览和 GitHub Actions CI。这样项目在 GitHub 上不仅能展示功能，也能体现基本的工程交付能力。
+杩欎竴灞傚睘浜庢渶鍒濊矾绾垮浘閲岀殑 `M4 宸ョ▼鍖栨敹灏綻銆? 
+瀹冧笉鏄€滀富鍔熻兘瀹炵幇鈥濈殑涓€閮ㄥ垎锛岃€屾槸鎶婇」鐩粠鈥滅爺绌跺瀷浣滃搧鈥濆線鈥滀紒涓氬寲浜や粯浣滃搧鈥濇帹杩涚殑鍏抽敭姝ラ銆?
+## 6. 闈㈣瘯閲屾€庝箞璁?
+鍙互杩欐牱姒傛嫭锛?
+鏍稿績鍔熻兘瀹屾垚鍚庯紝鎴戞病鏈夊仠鍦ㄢ€滆兘璺戔€濓紝鑰屾槸缁х画琛ヤ簡浜や粯灞傦紝鍖呮嫭 Docker Compose銆佸仴搴锋鏌ャ€丷EADME銆佹灦鏋勬€昏鍜?GitHub Actions CI銆傝繖鏍烽」鐩湪 GitHub 涓婁笉浠呰兘灞曠ず鍔熻兘锛屼篃鑳戒綋鐜板熀鏈殑宸ョ▼浜や粯鑳藉姏銆?

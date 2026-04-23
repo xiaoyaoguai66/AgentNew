@@ -1,35 +1,26 @@
-# AgentNews 逐步测试清单
+﻿# AgentNews 閫愭娴嬭瘯娓呭崟
 
-## 使用方式
+## 浣跨敤鏂瑰紡
 
-这份清单用于你每次改完功能后，按顺序验证项目是否还处在可运行状态。
-
-建议使用方式：
-
-1. 先做环境与状态检查
-2. 再测新闻主链路
-3. 再测缓存与热榜
-4. 再测 AI 助手 / 检索 / 向量索引
-5. 最后做一次前后端整体回归
+杩欎唤娓呭崟鐢ㄤ簬浣犳瘡娆℃敼瀹屽姛鑳藉悗锛屾寜椤哄簭楠岃瘉椤圭洰鏄惁杩樺鍦ㄥ彲杩愯鐘舵€併€?
+寤鸿浣跨敤鏂瑰紡锛?
+1. 鍏堝仛鐜涓庣姸鎬佹鏌?2. 鍐嶆祴鏂伴椈涓婚摼璺?3. 鍐嶆祴缂撳瓨涓庣儹姒?4. 鍐嶆祴 AI 鍔╂墜 / 妫€绱?/ 鍚戦噺绱㈠紩
+5. 鏈€鍚庡仛涓€娆″墠鍚庣鏁翠綋鍥炲綊
 
 ---
 
-## 一、环境与启动检查
+## 涓€銆佺幆澧冧笌鍚姩妫€鏌?
+### 1. 鍚庣鐜
 
-### 1. 后端环境
+纭锛?
+- 鏍圭洰褰?`.env` 宸插瓨鍦?- `MYSQL_URL` 姝ｇ‘
+- `REDIS_URL` 姝ｇ‘
+- `LLM_API_KEY` 姝ｇ‘
+- 濡傛灉鍚敤 Tavily锛宍TAVILY_API_KEY` 姝ｇ‘
+- 濡傛灉鍚敤鍚戦噺妫€绱紝`LOCAL_RETRIEVAL_ENGINE=hybrid-ready`
+- 濡傛灉鍚敤鍚戦噺妫€绱紝`ENABLE_VECTOR_RETRIEVAL=true`
 
-确认：
-
-- 根目录 `.env` 已存在
-- `MYSQL_URL` 正确
-- `REDIS_URL` 正确
-- `LLM_API_KEY` 正确
-- 如果启用 Tavily，`TAVILY_API_KEY` 正确
-- 如果启用向量检索，`LOCAL_RETRIEVAL_ENGINE=hybrid-ready`
-- 如果启用向量检索，`ENABLE_VECTOR_RETRIEVAL=true`
-
-推荐显式写上：
-
+鎺ㄨ崘鏄惧紡鍐欎笂锛?
 ```env
 QDRANT_URL=
 QDRANT_LOCAL_PATH=backend/data/qdrant
@@ -37,115 +28,86 @@ QDRANT_COLLECTION=agentnews_news_chunks
 QDRANT_TIMEOUT_SECONDS=5
 
 EMBEDDING_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings
-EMBEDDING_API_KEY=你的_key
+EMBEDDING_API_KEY=浣犵殑_key
 EMBEDDING_MODEL=text-embedding-v4
 ```
 
-说明：
+璇存槑锛?
+- `QDRANT_URL=` 涓虹┖鏄甯哥殑锛岃〃绀哄綋鍓嶄娇鐢ㄦ湰鍦?Qdrant 妯″紡
+- `QDRANT_LOCAL_PATH` 鎸囧悜鏈湴绱㈠紩鐩綍
 
-- `QDRANT_URL=` 为空是正常的，表示当前使用本地 Qdrant 模式
-- `QDRANT_LOCAL_PATH` 指向本地索引目录
+### 2. 鍩虹鏈嶅姟
 
-### 2. 基础服务
+纭锛?
+- MySQL 宸插惎鍔?- Redis 宸插惎鍔?- 鍓嶇宸插惎鍔?- 鍚庣宸插惎鍔?
+### 3. 缂栬瘧妫€鏌?
+寤鸿姣忔杈冨ぇ鏀瑰姩鍚庢墽琛岋細
 
-确认：
+- 鍚庣锛歚python -m compileall backend`
+- 鍓嶇锛歚npm run build`
 
-- MySQL 已启动
-- Redis 已启动
-- 前端已启动
-- 后端已启动
-
-### 3. 编译检查
-
-建议每次较大改动后执行：
-
-- 后端：`python -m compileall backend`
-- 前端：`npm run build`
-
-通过说明：
-
-- 至少没有明显语法错误
-- 前端可以正常打包
+閫氳繃璇存槑锛?
+- 鑷冲皯娌℃湁鏄庢樉璇硶閿欒
+- 鍓嶇鍙互姝ｅ父鎵撳寘
 
 ---
 
-## 二、新闻主链路检查
+## 浜屻€佹柊闂讳富閾捐矾妫€鏌?
+### 1. 鍒嗙被椤?
+楠岃瘉锛?
+- 棣栭〉鍒嗙被 tab 姝ｅ父鏄剧ず
+- 鍒嗙被鍒囨崲鑳藉埛鏂版柊闂绘祦
 
-### 1. 分类页
+### 2. 鏂伴椈璇︽儏
 
-验证：
+楠岃瘉锛?
+- 鐐瑰嚮鏂伴椈鑳借繘鍏ヨ鎯呴〉
+- 姝ｆ枃銆佹爣棰樸€佹椂闂淬€侀槄璇婚噺姝ｅ父
+- 鐩稿叧鎺ㄨ崘鑳借烦鍒颁笅涓€绡?
+### 3. 鏀惰棌 / 鍘嗗彶
 
-- 首页分类 tab 正常显示
-- 分类切换能刷新新闻流
-
-### 2. 新闻详情
-
-验证：
-
-- 点击新闻能进入详情页
-- 正文、标题、时间、阅读量正常
-- 相关推荐能跳到下一篇
-
-### 3. 收藏 / 历史
-
-验证：
-
-- 收藏新增 / 取消正常
-- 历史页能记录最近浏览
-- 删除单条 / 清空全部正常
+楠岃瘉锛?
+- 鏀惰棌鏂板 / 鍙栨秷姝ｅ父
+- 鍘嗗彶椤佃兘璁板綍鏈€杩戞祻瑙?- 鍒犻櫎鍗曟潯 / 娓呯┖鍏ㄩ儴姝ｅ父
 
 ---
 
-## 三、缓存与热榜检查
+## 涓夈€佺紦瀛樹笌鐑妫€鏌?
+### 1. 鍒嗙被 / 鍒楄〃缂撳瓨
 
-### 1. 分类 / 列表缓存
+楠岃瘉鏂瑰紡锛?
+- 杩炵画璇锋眰鍒嗙被鎺ュ彛涓ゆ
+- 杩炵画璇锋眰鏂伴椈鍒楄〃鎺ュ彛涓ゆ
 
-验证方式：
+棰勬湡锛?
+- 绗簩娆″懡涓洿蹇?- Redis 鎸傛帀鏃舵帴鍙ｄ粛鑳藉洖婧?MySQL
 
-- 连续请求分类接口两次
-- 连续请求新闻列表接口两次
+### 2. 娴忚閲忓閲?
+楠岃瘉鏂瑰紡锛?
+- 杩炵画鍒锋柊鍚屼竴鏉℃柊闂昏鎯呭娆?
+棰勬湡锛?
+- 鍓嶇鐪嬪埌鐨?`views` 浼氬闀?- 涓€娈垫椂闂村悗 MySQL 涓殑 `views` 浼氳鍥炲埛琛ラ綈
 
-预期：
+### 3. 鐑鎺ュ彛
 
-- 第二次命中更快
-- Redis 挂掉时接口仍能回源 MySQL
-
-### 2. 浏览量增量
-
-验证方式：
-
-- 连续刷新同一条新闻详情多次
-
-预期：
-
-- 前端看到的 `views` 会增长
-- 一段时间后 MySQL 中的 `views` 会被回刷补齐
-
-### 3. 热榜接口
-
-验证方式：
-
-- 多次访问某一新闻
-- 再请求：
+楠岃瘉鏂瑰紡锛?
+- 澶氭璁块棶鏌愪竴鏂伴椈
+- 鍐嶈姹傦細
   - `GET /api/news/hot?limit=5`
   - `GET /api/news/hot?categoryId=1&limit=5`
 
-预期：
-
-- 刚刚高频访问的新闻排序更靠前
+棰勬湡锛?
+- 鍒氬垰楂橀璁块棶鐨勬柊闂绘帓搴忔洿闈犲墠
 
 ---
 
-## 四、AI 助手状态检查
-
-### 1. 状态接口
-
-访问：
-
+## 鍥涖€丄I 鍔╂墜鐘舵€佹鏌?
+### 1. 鐘舵€佹帴鍙?
+璁块棶锛?
 - `GET /api/ai/status`
 - `GET /api/ai/index/status`
 
-重点检查字段：
+閲嶇偣妫€鏌ュ瓧娈碉細
 
 - `promptVersion`
 - `plannerEnabled`
@@ -158,50 +120,43 @@ EMBEDDING_MODEL=text-embedding-v4
 - `embeddingConfigMode`
 - `indexSyncReady`
 
-如果当前向量链路正常，预期应接近：
-
+濡傛灉褰撳墠鍚戦噺閾捐矾姝ｅ父锛岄鏈熷簲鎺ヨ繎锛?
 - `localRetrievalLabel = lexical-plus-qdrant`
 - `localHybridStrategy = weighted-rrf`
 - `dualRouteFilterStrategy = route-aware-filtering`
 - `finalRerankStrategy = plan-aware-cross-source`
 - `vectorRetrievalActive = true`
 - `embeddingConfigured = true`
-- `embeddingConfigMode = explicit` 或 `llm-fallback`
+- `embeddingConfigMode = explicit` 鎴?`llm-fallback`
 - `indexSyncReady = true`
 
-### 2. AI 页顶部状态
-
-打开 AI 页，顶部应能看到：
-
+### 2. AI 椤甸《閮ㄧ姸鎬?
+鎵撳紑 AI 椤碉紝椤堕儴搴旇兘鐪嬪埌锛?
 - `Prompt news-assistant-v6-route-filter-rerank`
-- `Planner 已开启`
-- `本地引擎 lexical-plus-qdrant`
-- `向量 已激活`
-- `索引 可同步`
-- `Embedding 显式配置 / LLM 回退`
-- `本地融合 Weighted RRF`
-- `双路过滤 Route-Aware`
-- `最终排序 Cross-Source`
+- `Planner 宸插紑鍚痐
+- `鏈湴寮曟搸 lexical-plus-qdrant`
+- `鍚戦噺 宸叉縺娲籤
+- `绱㈠紩 鍙悓姝
+- `Embedding 鏄惧紡閰嶇疆 / LLM 鍥為€€`
+- `鏈湴铻嶅悎 Weighted RRF`
+- `鍙岃矾杩囨护 Route-Aware`
+- `鏈€缁堟帓搴?Cross-Source`
 
 ---
 
-## 五、向量索引检查
+## 浜斻€佸悜閲忕储寮曟鏌?
+### 1. 棰勮鍒囧潡
 
-### 1. 预览切块
-
-访问：
-
+璁块棶锛?
 - `GET /api/ai/index/preview/1`
 
-预期：
-
-- 返回 `chunkCount`
-- 能看到 `snippet / text / charCount`
+棰勬湡锛?
+- 杩斿洖 `chunkCount`
+- 鑳界湅鍒?`snippet / text / charCount`
 
 ### 2. Dry Run
 
-请求：
-
+璇锋眰锛?
 `POST /api/ai/index/sync`
 
 ```json
@@ -211,15 +166,12 @@ EMBEDDING_MODEL=text-embedding-v4
 }
 ```
 
-预期：
+棰勬湡锛?
+- 杩斿洖澶氬皯鏉℃柊闂汇€佸灏戜釜 chunk
+- 涓嶇湡姝ｅ啓鍏ョ储寮?
+### 3. 鐪熷疄鍚屾
 
-- 返回多少条新闻、多少个 chunk
-- 不真正写入索引
-
-### 3. 真实同步
-
-请求：
-
+璇锋眰锛?
 ```json
 {
   "dryRun": false,
@@ -227,139 +179,105 @@ EMBEDDING_MODEL=text-embedding-v4
 }
 ```
 
-预期：
-
+棰勬湡锛?
 - `status = synced`
-- `upsertedPoints` 有值
-- `vectorSize` 有值
-
+- `upsertedPoints` 鏈夊€?- `vectorSize` 鏈夊€?
 ---
 
-## 六、本地检索检查
+## 鍏€佹湰鍦版绱㈡鏌?
+### 1. lexical 妫€绱?
+杈撳叆锛?
+- 甯︽湁寮哄疄浣撹瘝鐨勯棶棰?- 鐩存帴澶嶈堪鏂伴椈鏍囬鐨勯棶棰?
+棰勬湡锛?
+- 鏇村鏄撳懡涓湰鍦版柊闂?- 鏉ユ簮鏍囩鏇村鏄撳嚭鐜?`lexical`
 
-### 1. lexical 检索
-
-输入：
-
-- 带有强实体词的问题
-- 直接复述新闻标题的问题
-
-预期：
-
-- 更容易命中本地新闻
-- 来源标签更容易出现 `lexical`
-
-### 2. vector 检索
-
-输入：
-
-- 不直接复述标题，而是换一种语义表达
-
-预期：
-
-- 仍然能命中相近新闻
-- 来源标签可能出现 `vector`
+### 2. vector 妫€绱?
+杈撳叆锛?
+- 涓嶇洿鎺ュ杩版爣棰橈紝鑰屾槸鎹竴绉嶈涔夎〃杈?
+棰勬湡锛?
+- 浠嶇劧鑳藉懡涓浉杩戞柊闂?- 鏉ユ簮鏍囩鍙兘鍑虹幇 `vector`
 
 ### 3. local hybrid
 
-输入：
+杈撳叆锛?
+- 鏃㈠寘鍚爣棰樿繎浼硷紝鍙堝寘鍚涔夋敼鍐欑殑闂
 
-- 既包含标题近似，又包含语义改写的问题
-
-预期：
-
-- 来源标签更容易出现 `lexical+vector`
+棰勬湡锛?
+- 鏉ユ簮鏍囩鏇村鏄撳嚭鐜?`lexical+vector`
 
 ---
 
-## 七、Tavily 与双路检索检查
-
-### 1. Tavily 状态
-
-如果配置了 `TAVILY_API_KEY`，预期：
+## 涓冦€乀avily 涓庡弻璺绱㈡鏌?
+### 1. Tavily 鐘舵€?
+濡傛灉閰嶇疆浜?`TAVILY_API_KEY`锛岄鏈燂細
 
 - `webSearchEnabled = true`
-- AI 页显示 `Tavily 已开启`
+- AI 椤垫樉绀?`Tavily 宸插紑鍚痐
 
-### 2. 中文 Web Query Rewrite
+### 2. 涓枃 Web Query Rewrite
 
-输入：
+杈撳叆锛?
+- `鍗槦鍙戝皠璁″垝`
+- `鏈€杩戝浗闄呮补浠峰彉鍖朻
+- `澶фā鍨嬭瀺璧勫姩鎬乣
 
-- `卫星发射计划`
-- `最近国际油价变化`
-- `大模型融资动态`
+棰勬湡锛?
+- 鍗充究鏄腑鏂囬棶棰橈紝涔熻兘鏇村鏄撴嬁鍒?Web 鏉ユ簮
 
-预期：
+### 3. 涓夌妫€绱㈣鍒?
+娴嬭瘯闂锛?
+- `鏍规嵁鏈湴鏂伴椈搴撴€荤粨涓€涓嬬鎶€鐑偣`
+  - 棰勬湡锛歚local-first`
 
-- 即便是中文问题，也能更容易拿到 Web 来源
+- `浠婂ぉ鏈€鏂扮殑鍗槦鍙戝皠璁″垝鏈変粈涔堣繘灞昤
+  - 棰勬湡锛歚web-first`
 
-### 3. 三种检索计划
-
-测试问题：
-
-- `根据本地新闻库总结一下科技热点`
-  - 预期：`local-first`
-
-- `今天最新的卫星发射计划有什么进展`
-  - 预期：`web-first`
-
-- `最近科技新闻里哪些变化最可能影响大模型行业`
-  - 预期：`hybrid`
+- `鏈€杩戠鎶€鏂伴椈閲屽摢浜涘彉鍖栨渶鍙兘褰卞搷澶фā鍨嬭涓歚
+  - 棰勬湡锛歚hybrid`
 
 ---
 
-## 八、最终回答与来源检查
+## 鍏€佹渶缁堝洖绛斾笌鏉ユ簮妫€鏌?
+姣忔 AI 鍥炵瓟鍚庯紝閲嶇偣鐪嬶細
 
-每次 AI 回答后，重点看：
+- 鏄惁杩斿洖 `retrievalPlan`
+- 鏄惁杩斿洖 `strategy`
+- 鏄惁杩斿洖 `confidence`
+- 鏄惁杩斿洖 `sources`
+- 鏈湴鏉ユ簮鏄惁鑳借烦璇︽儏椤?- Web 鏉ユ簮鏄惁鑳芥墦寮€澶栭摼
 
-- 是否返回 `retrievalPlan`
-- 是否返回 `strategy`
-- 是否返回 `confidence`
-- 是否返回 `sources`
-- 本地来源是否能跳详情页
-- Web 来源是否能打开外链
-
-对来源卡片特别看：
-
-- 时间
-- 域名
+瀵规潵婧愬崱鐗囩壒鍒湅锛?
+- 鏃堕棿
+- 鍩熷悕
 - `lexical / vector / lexical+vector / web`
-- 综合分数
+- 缁煎悎鍒嗘暟
 
 ---
 
-## 九、问题排查提示
+## 涔濄€侀棶棰樻帓鏌ユ彁绀?
+### 1. `QDRANT_URL` 鐣欑┖
 
-### 1. `QDRANT_URL` 留空
+杩欐槸姝ｅ父鐨勶紝琛ㄧず褰撳墠浣跨敤鏈湴 Qdrant 妯″紡锛屼笉褰卞搷鍔熻兘銆?
+### 2. `Embedding` 鏄剧ず `LLM 鍥為€€`
 
-这是正常的，表示当前使用本地 Qdrant 模式，不影响功能。
+璇存槑褰撳墠 embedding 娌℃湁鏄惧紡閰嶇疆锛岃€屾槸娌跨敤浜嗚亰澶╂ā鍨嬮厤缃€?
+涓嶆槸閿欒锛屼絾濡傛灉浣犳兂璁╅厤缃洿娓呮锛屽缓璁樉寮忚ˉ涓?`EMBEDDING_*`銆?
+### 3. `绱㈠紩 鍙悓姝 浣嗘绱㈡病鍛戒腑
 
-### 2. `Embedding` 显示 `LLM 回退`
+鍏堢‘璁わ細
 
-说明当前 embedding 没有显式配置，而是沿用了聊天模型配置。
+1. 鏄惁鐪熺殑鎵ц杩?`dryRun=false` 鐨勫悓姝?2. 鎻愰棶鐨勬柊闂绘槸鍚﹀凡缁忚绱㈠紩
+3. 鎻愰棶鏄惁鏇村亸 lexical銆乿ector 鎴?Web
 
-不是错误，但如果你想让配置更清楚，建议显式补上 `EMBEDDING_*`。
+### 4. 閲嶅惎鍚庣鍚庣姸鎬佹病鍙?
+浼樺厛妫€鏌ワ細
 
-### 3. `索引 可同步` 但检索没命中
-
-先确认：
-
-1. 是否真的执行过 `dryRun=false` 的同步
-2. 提问的新闻是否已经被索引
-3. 提问是否更偏 lexical、vector 或 Web
-
-### 4. 重启后端后状态没变
-
-优先检查：
-
-- 修改的是根目录 `.env`，不是 `.env.example`
-- 后端是否真的重启了
-
+- 淇敼鐨勬槸鏍圭洰褰?`.env`锛屼笉鏄?`.env.example`
+- 鍚庣鏄惁鐪熺殑閲嶅惎浜?
 ---
 
-## 十、建议回归顺序
-
-每次大改后，建议按这个顺序回归：
+## 鍗併€佸缓璁洖褰掗『搴?
+姣忔澶ф敼鍚庯紝寤鸿鎸夎繖涓『搴忓洖褰掞細
 
 1. `python -m compileall backend`
 2. `npm run build`
@@ -367,135 +285,105 @@ EMBEDDING_MODEL=text-embedding-v4
 4. `/api/ai/index/status`
 5. `/api/ai/index/preview/1`
 6. `/api/ai/index/sync` dry-run
-7. `/api/ai/index/sync` 真实同步
-8. 首页 / 详情 / 收藏 / 历史
-9. AI 页三类问题：
+7. `/api/ai/index/sync` 鐪熷疄鍚屾
+8. 棣栭〉 / 璇︽儏 / 鏀惰棌 / 鍘嗗彶
+9. AI 椤典笁绫婚棶棰橈細
    - local-first
    - hybrid
    - web-first
 
-按这套顺序，基本能比较快定位是：
+鎸夎繖濂楅『搴忥紝鍩烘湰鑳芥瘮杈冨揩瀹氫綅鏄細
 
-- 配置问题
-- 索引问题
-- 检索问题
-- 前端展示问题
+- 閰嶇疆闂
+- 绱㈠紩闂
+- 妫€绱㈤棶棰?- 鍓嶇灞曠ず闂
 
 ---
 
-## 十一、Verifier 与抗幻觉检查
-
-### 1. 状态接口
-
-访问：
-
+## 鍗佷竴銆乂erifier 涓庢姉骞昏妫€鏌?
+### 1. 鐘舵€佹帴鍙?
+璁块棶锛?
 - `GET /api/ai/status`
 
-重点确认：
-
+閲嶇偣纭锛?
 - `verifierEnabled = true`
 - `verifierStrategy = rule-based-post-verifier`
 
-AI 页顶部应显示：
-
+AI 椤甸《閮ㄥ簲鏄剧ず锛?
 - `Verifier Rule-Based`
 
-### 2. 无证据拒答
-
-输入一个本地和 Web 都难以命中的问题。
-
-预期：
-
+### 2. 鏃犺瘉鎹嫆绛?
+杈撳叆涓€涓湰鍦板拰 Web 閮介毦浠ュ懡涓殑闂銆?
+棰勬湡锛?
 - `verificationStatus = refused`
 - `evidenceLevel = none`
 - `guardrailApplied = true`
 
-### 3. 低置信度回退
+### 3. 浣庣疆淇″害鍥為€€
 
-输入一个只命中少量来源、或者只有 1 条弱 Web 来源的问题。
-
-预期：
-
+杈撳叆涓€涓彧鍛戒腑灏戦噺鏉ユ簮銆佹垨鑰呭彧鏈?1 鏉″急 Web 鏉ユ簮鐨勯棶棰樸€?
+棰勬湡锛?
 - `verificationStatus = guarded`
 - `evidenceLevel = weak`
 - `guardrailApplied = true`
 
-并且回答正文前面会出现更保守的提醒，而不是直接给出强结论。
+骞朵笖鍥炵瓟姝ｆ枃鍓嶉潰浼氬嚭鐜版洿淇濆畧鐨勬彁閱掞紝鑰屼笉鏄洿鎺ョ粰鍑哄己缁撹銆?
+### 4. 姝ｅ父閫氳繃
 
-### 4. 正常通过
-
-输入一个来源较多、且本地与 Web 互相支撑的问题。
-
-预期：
-
+杈撳叆涓€涓潵婧愯緝澶氥€佷笖鏈湴涓?Web 浜掔浉鏀拺鐨勯棶棰樸€?
+棰勬湡锛?
 - `verificationStatus = accepted`
 - `guardrailApplied = false`
-- `evidenceLevel = moderate` 或 `strong`
+- `evidenceLevel = moderate` 鎴?`strong`
 
 ---
 
-## 十二、Query Analysis 与 Formatter 检查
-
-### 1. 状态接口
-
-访问：
-
+## 鍗佷簩銆丵uery Analysis 涓?Formatter 妫€鏌?
+### 1. 鐘舵€佹帴鍙?
+璁块棶锛?
 - `GET /api/ai/status`
 
-重点确认：
-
+閲嶇偣纭锛?
 - `queryAnalysisEnabled = true`
 - `queryAnalysisStrategy = heuristic-query-analysis`
 - `responseFormatterEnabled = true`
 - `responseFormatterStrategy = evidence-aware-followups`
 
-### 2. AI 页顶部状态
-
-打开 AI 页后，顶部应出现：
-
+### 2. AI 椤甸《閮ㄧ姸鎬?
+鎵撳紑 AI 椤靛悗锛岄《閮ㄥ簲鍑虹幇锛?
 - `Analysis Heuristic`
 - `Formatter Follow-Ups`
 
-### 3. 回答内的问题分析
+### 3. 鍥炵瓟鍐呯殑闂鍒嗘瀽
 
-输入三类问题：
+杈撳叆涓夌被闂锛?
+- `鏍规嵁鏈湴鏂伴椈搴撴€荤粨涓€涓嬬鎶€鐑偣`
+- `浠婂ぉ鏈€鏂扮殑鍗槦鍙戝皠璁″垝鏈変粈涔堣繘灞昤
+- `鏈€杩戠鎶€鏂伴椈閲屽摢浜涘彉鍖栨渶鍙兘褰卞搷澶фā鍨嬭涓歚
 
-- `根据本地新闻库总结一下科技热点`
-- `今天最新的卫星发射计划有什么进展`
-- `最近科技新闻里哪些变化最可能影响大模型行业`
+棰勬湡姣忔潯鍥炵瓟閮借兘鐪嬪埌锛?
+- `鎰忓浘`
+- `鏃舵晥`
+- `鑼冨洿`
+- `鍒嗘瀽璇存槑`
 
-预期每条回答都能看到：
+### 4. 杩介棶寤鸿
 
-- `意图`
-- `时效`
-- `范围`
-- `分析说明`
+姣忔潯鍥炵瓟搴斿嚭鐜?1 鍒?3 鏉¤拷闂缓璁€?
+鐐瑰嚮浠绘剰寤鸿锛岄鏈燂細
 
-### 4. 追问建议
-
-每条回答应出现 1 到 3 条追问建议。
-
-点击任意建议，预期：
-
-- 会直接发起新一轮对话
-- 不需要手动复制建议文本
-
+- 浼氱洿鎺ュ彂璧锋柊涓€杞璇?- 涓嶉渶瑕佹墜鍔ㄥ鍒跺缓璁枃鏈?
 ---
 
-## 十三、Stateful Workflow 与执行轨迹检查
-
-### 1. 状态接口
-
-访问：
-
+## 鍗佷笁銆丼tateful Workflow 涓庢墽琛岃建杩规鏌?
+### 1. 鐘舵€佹帴鍙?
+璁块棶锛?
 - `GET /api/ai/status`
 
-重点确认：
-
+閲嶇偣纭锛?
 - `workflowEnabled = true`
 - `workflowStyle = stateful-node-pipeline`
-- `workflowNodes` 至少包含：
-  - `query-analysis`
+- `workflowNodes` 鑷冲皯鍖呭惈锛?  - `query-analysis`
   - `retrieval-planner`
   - `retrieval`
   - `route-filter`
@@ -504,103 +392,83 @@ AI 页顶部应显示：
   - `verifier`
   - `response-formatter`
 
-### 2. AI 页顶部状态
-
-打开 AI 页，应看到：
+### 2. AI 椤甸《閮ㄧ姸鎬?
+鎵撳紑 AI 椤碉紝搴旂湅鍒帮細
 
 - `Workflow Stateful`
 
-### 3. 回答内工作流摘要
+### 3. 鍥炵瓟鍐呭伐浣滄祦鎽樿
 
-问任意问题，回答里应出现：
+闂换鎰忛棶棰橈紝鍥炵瓟閲屽簲鍑虹幇锛?
+- `宸ヤ綔娴侊細query-analysis -> retrieval-planner -> ...`
 
-- `工作流：query-analysis -> retrieval-planner -> ...`
+### 4. 鍥炵瓟鍐呮墽琛岃建杩?
+姣忔潯鍥炵瓟搴旂湅鍒拌嫢骞?trace 琛岋紝鑳戒綋鐜版瘡涓妭鐐癸細
 
-### 4. 回答内执行轨迹
+- 鍋氫簡浠€涔?- 褰撳墠鐘舵€佹槸 `瀹屾垚 / 淇濇姢 / 鍥為€€`
 
-每条回答应看到若干 trace 行，能体现每个节点：
+### 5. 鍦烘櫙宸紓
 
-- 做了什么
-- 当前状态是 `完成 / 保护 / 回退`
+閲嶇偣瀵规瘮锛?
+- 姝ｅ父鍛戒腑鍦烘櫙
+- 浣庣疆淇″害鍥為€€鍦烘櫙
+- 鏃犺瘉鎹嫆绛斿満鏅?
+棰勬湡 trace 涓?`verifier` 鐨勭姸鎬佷細涓嶅悓銆?---
 
-### 5. 场景差异
+## 鍗佸洓銆丩angSmith SDK Tracing 妫€鏌?### 1. 鐜鍙橀噺
 
-重点对比：
-
-- 正常命中场景
-- 低置信度回退场景
-- 无证据拒答场景
-
-预期 trace 中 `verifier` 的状态会不同。
----
-
-## 十四、LangSmith SDK Tracing 检查
-### 1. 环境变量
-
-确认根目录 `.env` 中已配置：
-
+纭鏍圭洰褰?`.env` 涓凡閰嶇疆锛?
 - `LANGSMITH_TRACING=true`
 - `LANGSMITH_API_KEY=...`
 - `LANGSMITH_PROJECT=agentnews-dev`
 
-### 2. 状态接口
-
-访问：
-
+### 2. 鐘舵€佹帴鍙?
+璁块棶锛?
 - `GET /api/ai/status`
 
-重点确认：
-
+閲嶇偣纭锛?
 - `langsmithReady = true`
 - `langsmithSdkInstalled = true`
 - `langsmithConfigured = true`
 
-### 3. 实际问答
+### 3. 瀹為檯闂瓟
 
-发起一轮 AI 问答后，检查：
+鍙戣捣涓€杞?AI 闂瓟鍚庯紝妫€鏌ワ細
 
-- 前端回答中有 `Trace / Run`
-- `GET /api/ai/runs/recent` 有新记录
-- 本地 `agent_runs.jsonl` 有新记录
-- LangSmith 平台能看到对应 trace
+- 鍓嶇鍥炵瓟涓湁 `Trace / Run`
+- `GET /api/ai/runs/recent` 鏈夋柊璁板綍
+- 鏈湴 `agent_runs.jsonl` 鏈夋柊璁板綍
+- LangSmith 骞冲彴鑳界湅鍒板搴?trace
 
 ---
 
-## 十五、LangGraph StateGraph 检查
-### 1. 环境变量
+## 鍗佷簲銆丩angGraph StateGraph 妫€鏌?### 1. 鐜鍙橀噺
 
-确认根目录 `.env` 中：
+纭鏍圭洰褰?`.env` 涓細
 
 - `AGENT_WORKFLOW_ENGINE=langgraph`
 
-### 2. 状态接口
-
-访问：
-
+### 2. 鐘舵€佹帴鍙?
+璁块棶锛?
 - `GET /api/ai/status`
 
-重点确认：
-
+閲嶇偣纭锛?
 - `workflowEnabled = true`
 - `workflowEngine = "langgraph"`
 - `workflowStyle = "langgraph-stategraph"`
 - `graphVisualizationReady = true`
 
-### 3. AI 页顶部状态
-
-打开 AI 页，顶部应看到：
+### 3. AI 椤甸《閮ㄧ姸鎬?
+鎵撳紑 AI 椤碉紝椤堕儴搴旂湅鍒帮細
 
 - `Workflow LangGraph`
 - `Graph Ready`
 
-### 4. LangSmith 图视图
+### 4. LangSmith 鍥捐鍥?
+鍙戣捣涓€杞?AI 闂瓟鍚庯紝鍦?LangSmith 骞冲彴妫€鏌ワ細
 
-发起一轮 AI 问答后，在 LangSmith 平台检查：
-
-- 是否能看到 `AgentNews Workflow`
-- 是否能看到节点执行链路
-- 节点中应包含：
-  - `query-analysis`
+- 鏄惁鑳界湅鍒?`AgentNews Workflow`
+- 鏄惁鑳界湅鍒拌妭鐐规墽琛岄摼璺?- 鑺傜偣涓簲鍖呭惈锛?  - `query-analysis`
   - `retrieval-planner`
   - `retrieval`
   - `route-filter`
@@ -608,33 +476,26 @@ AI 页顶部应显示：
   - `generator`
   - `verifier`
   - `response-formatter`
-  - `no-evidence-response`（在无证据场景下）
-
+  - `no-evidence-response`锛堝湪鏃犺瘉鎹満鏅笅锛?
 ---
 
-## 十六、Workflow Graph Export 检查
-### 1. 图结构接口
-
-访问：
-
+## 鍗佸叚銆乄orkflow Graph Export 妫€鏌?### 1. 鍥剧粨鏋勬帴鍙?
+璁块棶锛?
 - `GET /api/ai/workflow/graph`
 
-重点确认：
-
+閲嶇偣纭锛?
 - `engine = "langgraph"`
 - `style = "langgraph-stategraph"`
 - `graphVisualizationReady = true`
 
-### 2. 节点与边
+### 2. 鑺傜偣涓庤竟
 
-返回里应看到：
-
+杩斿洖閲屽簲鐪嬪埌锛?
 - `nodes`
 - `edges`
 - `mermaid`
 
-节点中应至少包含：
-
+鑺傜偣涓簲鑷冲皯鍖呭惈锛?
 - `__start__`
 - `query-analysis`
 - `retrieval-planner`
@@ -649,74 +510,59 @@ AI 页顶部应显示：
 
 ### 3. Mermaid
 
-把 `mermaid` 文本复制到支持 Mermaid 的 Markdown 环境里，应能渲染流程图。
-
+鎶?`mermaid` 鏂囨湰澶嶅埗鍒版敮鎸?Mermaid 鐨?Markdown 鐜閲岋紝搴旇兘娓叉煋娴佺▼鍥俱€?
 ---
 
-## 十七、Evaluation Baseline 检查
-### 1. 评测集
-
-访问：
-
+## 鍗佷竷銆丒valuation Baseline 妫€鏌?### 1. 璇勬祴闆?
+璁块棶锛?
 - `GET /api/ai/eval/dataset`
 
-应看到预置评测样本。
-
-### 2. 跑基线评测
-
-请求：
-
+搴旂湅鍒伴缃瘎娴嬫牱鏈€?
+### 2. 璺戝熀绾胯瘎娴?
+璇锋眰锛?
 - `POST /api/ai/eval/run`
 
-示例 body：
-
+绀轰緥 body锛?
 ```json
 {
   "limit": 6
 }
 ```
 
-### 3. 结果字段
+### 3. 缁撴灉瀛楁
 
-重点确认：
-
+閲嶇偣纭锛?
 - `plannerAccuracy`
 - `intentAccuracy`
 - `freshnessAccuracy`
 - `scopeAccuracy`
 - `results`
 
-### 4. 单条 case
+### 4. 鍗曟潯 case
 
-每个 `result` 里应包含：
-
+姣忎釜 `result` 閲屽簲鍖呭惈锛?
 - `actualPlan / expectedPlan`
 - `actualIntent / expectedIntent`
 - `actualFreshness / expectedFreshness`
 - `actualScope / expectedScope`
 - `mismatches`
 
-### 5. 环境影响
+### 5. 鐜褰卞搷
 
-如果 `TAVILY_API_KEY` 未启用，`webEnabled` 会影响 planner 结果。  
-所以建议在 Tavily 已开启的环境下跑这组 baseline。
-
+濡傛灉 `TAVILY_API_KEY` 鏈惎鐢紝`webEnabled` 浼氬奖鍝?planner 缁撴灉銆? 
+鎵€浠ュ缓璁湪 Tavily 宸插紑鍚殑鐜涓嬭窇杩欑粍 baseline銆?
 ---
 
-## 十八、Evaluation Feedback Loop 检查
-### 1. 跑一次评测
-
-请求：
-
+## 鍗佸叓銆丒valuation Feedback Loop 妫€鏌?### 1. 璺戜竴娆¤瘎娴?
+璇锋眰锛?
 - `POST /api/ai/eval/run`
 
-### 2. 查看最近评测 run
+### 2. 鏌ョ湅鏈€杩戣瘎娴?run
 
-访问：
-
+璁块棶锛?
 - `GET /api/ai/eval/runs/recent`
 
-应看到：
+搴旂湅鍒帮細
 
 - `runId`
 - `recordedAt`
@@ -727,13 +573,12 @@ AI 页顶部应显示：
 - `freshnessAccuracy`
 - `scopeAccuracy`
 
-### 3. 查看最近失败 case
+### 3. 鏌ョ湅鏈€杩戝け璐?case
 
-访问：
-
+璁块棶锛?
 - `GET /api/ai/eval/failures/recent`
 
-应看到：
+搴旂湅鍒帮細
 
 - `caseId`
 - `title`
@@ -743,14 +588,11 @@ AI 页顶部应显示：
 - `expectedFreshness / actualFreshness`
 - `expectedScope / actualScope`
 
-### 4. LangSmith Evaluation 状态
-
-访问：
-
+### 4. LangSmith Evaluation 鐘舵€?
+璁块棶锛?
 - `GET /api/ai/eval/langsmith/status`
 
-重点确认：
-
+閲嶇偣纭锛?
 - `langsmithReady`
 - `langsmithConfigured`
 - `datasetUploadReady`
@@ -758,11 +600,10 @@ AI 页顶部应显示：
 
 ### 5. LangSmith Export
 
-访问：
-
+璁块棶锛?
 - `GET /api/ai/eval/langsmith/export`
 
-应看到：
+搴旂湅鍒帮細
 
 - `datasetName`
 - `exampleCount`
@@ -770,16 +611,13 @@ AI 页顶部应显示：
 
 ### 6. LangSmith Sync
 
-请求：
-
+璇锋眰锛?
 - `POST /api/ai/eval/langsmith/sync`
 
-如果当前 LangSmith 已配置，预期：
-
+濡傛灉褰撳墠 LangSmith 宸查厤缃紝棰勬湡锛?
 - `synced = true`
-- 返回 `datasetId`
+- 杩斿洖 `datasetId`
 
-如果未配置，预期：
-
+濡傛灉鏈厤缃紝棰勬湡锛?
 - `synced = false`
-- `note` 说明当前仅支持本地导出
+- `note` 璇存槑褰撳墠浠呮敮鎸佹湰鍦板鍑?

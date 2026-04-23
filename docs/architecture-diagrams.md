@@ -1,9 +1,7 @@
-# AgentNews 架构图集
+﻿# AgentNews 鏋舵瀯鍥鹃泦
 
-这份文档只做一件事：把项目里最值得展示的几张图单独收口，方便你后续截图、贴到 GitHub，或者面试时直接打开讲。
-
-## 1. 系统总览图
-
+杩欎唤鏂囨。鍙仛涓€浠朵簨锛氭妸椤圭洰閲屾渶鍊煎緱灞曠ず鐨勫嚑寮犲浘鍗曠嫭鏀跺彛锛屾柟渚夸綘鍚庣画鎴浘銆佽创鍒?GitHub锛屾垨鑰呴潰璇曟椂鐩存帴鎵撳紑璁层€?
+## 1. 绯荤粺鎬昏鍥?
 ```mermaid
 flowchart LR
     UI["Vue Mobile App"] --> API["FastAPI API Layer"]
@@ -17,13 +15,11 @@ flowchart LR
     LANGGRAPH --> LANGSMITH["LangSmith Tracing"]
 ```
 
-适合：
-
+閫傚悎锛?
 - README
-- GitHub 首页
-- 面试开场
-
-## 2. 新闻 Agent 工作流图
+- GitHub 棣栭〉
+- 闈㈣瘯寮€鍦?
+## 2. 鏂伴椈 Agent 宸ヤ綔娴佸浘
 
 ```mermaid
 flowchart LR
@@ -40,12 +36,11 @@ flowchart LR
     FMT --> OUT["Answer / Sources / Trace / Follow-ups"]
 ```
 
-适合：
+閫傚悎锛?
+- 璁?Agent 缁撴瀯
+- 瑙ｉ噴涓轰粈涔堜笉鏄嚜鐢?Agent
 
-- 讲 Agent 结构
-- 解释为什么不是自由 Agent
-
-## 3. 会话与记忆图
+## 3. 浼氳瘽涓庤蹇嗗浘
 
 ```mermaid
 flowchart LR
@@ -59,14 +54,11 @@ flowchart LR
     PROMPT --> AGENT["LangGraph Workflow"]
 ```
 
-适合：
+閫傚悎锛?
+- 璁?session memory
+- 璁茶亰澶╃獥鍙ｇ鐞?- 瑙ｉ噴鈥滆蹇嗏€濆拰鈥滀細璇濆垪琛ㄢ€濈殑鍖哄埆
 
-- 讲 session memory
-- 讲聊天窗口管理
-- 解释“记忆”和“会话列表”的区别
-
-## 4. 评测闭环图
-
+## 4. 璇勬祴闂幆鍥?
 ```mermaid
 flowchart LR
     DATASET["Eval Dataset"] --> RUN["Eval Run"]
@@ -77,19 +69,15 @@ flowchart LR
     RUN --> LANGSMITH["LangSmith Eval / Trace"]
 ```
 
-适合：
+閫傚悎锛?
+- 璁蹭负浠€涔堥」鐩笉鏄彧浼氬洖绛?- 璁茶皟浼橀棴鐜拰澶辫触鏍锋湰娌夋穩
 
-- 讲为什么项目不是只会回答
-- 讲调优闭环和失败样本沉淀
+## 5. 浣跨敤寤鸿
 
-## 5. 使用建议
+濡傛灉浣犲悗闈㈠彧鎯虫寫 1 鍒?2 寮犲浘鏀惧埌 GitHub 棣栭〉锛屼紭鍏堢敤锛?
+1. 绯荤粺鎬昏鍥?2. 鏂伴椈 Agent 宸ヤ綔娴佸浘
 
-如果你后面只想挑 1 到 2 张图放到 GitHub 首页，优先用：
+濡傛灉鏄潰璇曢噷缁嗚锛屽啀琛ワ細
 
-1. 系统总览图
-2. 新闻 Agent 工作流图
-
-如果是面试里细讲，再补：
-
-3. 会话与记忆图
-4. 评测闭环图
+3. 浼氳瘽涓庤蹇嗗浘
+4. 璇勬祴闂幆鍥?

@@ -1,4 +1,4 @@
-# AgentNews
+﻿# AgentNews
 
 AgentNews is a mobile-first news platform with an enterprise-style AI agent stack. The project combines a Vue 3 news app, a FastAPI backend, MySQL, Redis caching, Qdrant-based local vector retrieval, Tavily web search, LangGraph workflow orchestration, and LangSmith tracing.
 
@@ -45,7 +45,7 @@ flowchart LR
 ### 1. Backend
 
 ```powershell
-cd D:\Code\Fastapi\AgentNews\backend
+cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
@@ -55,14 +55,14 @@ uvicorn main:app --reload
 ### 2. Frontend
 
 ```powershell
-cd D:\Code\Fastapi\AgentNews\frontend
+cd frontend
 npm install
 npm run dev
 ```
 
 ### 3. Required `.env`
 
-Use [`.env.example`](D:/Code/Fastapi/AgentNews/.env.example) as the template. At minimum you need:
+Use [`.env.example`](.env.example) as the template. At minimum you need:
 
 - `MYSQL_URL`
 - `REDIS_URL`
@@ -85,7 +85,7 @@ Recommended for full agent capability:
 Run the repo-level dev check:
 
 ```powershell
-cd D:\Code\Fastapi\AgentNews
+cd .
 powershell -ExecutionPolicy Bypass -File .\scripts\dev-check.ps1
 ```
 
@@ -98,10 +98,10 @@ This will:
 
 ## Docker Compose
 
-The repo now includes [docker-compose.yml](D:/Code/Fastapi/AgentNews/docker-compose.yml) plus backend/frontend Dockerfiles.
+The repo now includes [docker-compose.yml](docker-compose.yml) plus backend/frontend Dockerfiles.
 
 ```powershell
-cd D:\Code\Fastapi\AgentNews
+cd .
 docker compose up --build
 ```
 
@@ -137,7 +137,7 @@ Qdrant is currently packaged in local persistent mode through the backend servic
 If you want one shortest path to verify the repo locally, run:
 
 ```powershell
-cd D:\Code\Fastapi\AgentNews
+cd .
 powershell -ExecutionPolicy Bypass -File .\scripts\dev-check.ps1
 ```
 
@@ -150,18 +150,20 @@ This covers:
 
 ## Suggested Reading Order
 
-- [docs/project-status-and-next-step.md](D:/Code/Fastapi/AgentNews/docs/project-status-and-next-step.md)
-- [docs/architecture-overview.md](D:/Code/Fastapi/AgentNews/docs/architecture-overview.md)
-- [docs/architecture-diagrams.md](D:/Code/Fastapi/AgentNews/docs/architecture-diagrams.md)
-- [docs/documentation-map.md](D:/Code/Fastapi/AgentNews/docs/documentation-map.md)
-- [docs/m4-ci-and-delivery-hardening.md](D:/Code/Fastapi/AgentNews/docs/m4-ci-and-delivery-hardening.md)
-- [docs/m4-automated-smoke-tests.md](D:/Code/Fastapi/AgentNews/docs/m4-automated-smoke-tests.md)
-- [docs/m4-integration-tests-and-final-showcase.md](D:/Code/Fastapi/AgentNews/docs/m4-integration-tests-and-final-showcase.md)
-- [docs/m4-dev-check-and-demo-materials.md](D:/Code/Fastapi/AgentNews/docs/m4-dev-check-and-demo-materials.md)
-- [docs/demo-script.md](D:/Code/Fastapi/AgentNews/docs/demo-script.md)
-- [docs/github-showcase-guide.md](D:/Code/Fastapi/AgentNews/docs/github-showcase-guide.md)
-- [docs/m3-session-memory-and-summary.md](D:/Code/Fastapi/AgentNews/docs/m3-session-memory-and-summary.md)
-- [docs/m3-session-window-management.md](D:/Code/Fastapi/AgentNews/docs/m3-session-window-management.md)
-- [docs/final-delivery-checklist.md](D:/Code/Fastapi/AgentNews/docs/final-delivery-checklist.md)
-- [docs/testing-checklist.md](D:/Code/Fastapi/AgentNews/docs/testing-checklist.md)
-- [docs/agent-method-evolution.md](D:/Code/Fastapi/AgentNews/docs/agent-method-evolution.md)
+- [docs/project-status-and-next-step.md](docs/project-status-and-next-step.md)
+- [docs/architecture-overview.md](docs/architecture-overview.md)
+- [docs/architecture-diagrams.md](docs/architecture-diagrams.md)
+- [docs/documentation-map.md](docs/documentation-map.md)
+- [docs/m4-ci-and-delivery-hardening.md](docs/m4-ci-and-delivery-hardening.md)
+- [docs/m4-automated-smoke-tests.md](docs/m4-automated-smoke-tests.md)
+- [docs/m4-integration-tests-and-final-showcase.md](docs/m4-integration-tests-and-final-showcase.md)
+- [docs/m4-dev-check-and-demo-materials.md](docs/m4-dev-check-and-demo-materials.md)
+- [docs/demo-script.md](docs/demo-script.md)
+- [docs/github-showcase-guide.md](docs/github-showcase-guide.md)
+- [docs/m3-session-memory-and-summary.md](docs/m3-session-memory-and-summary.md)
+- [docs/m3-session-window-management.md](docs/m3-session-window-management.md)
+- [docs/final-delivery-checklist.md](docs/final-delivery-checklist.md)
+- [docs/testing-checklist.md](docs/testing-checklist.md)
+- [docs/agent-method-evolution.md](docs/agent-method-evolution.md)
+
+

@@ -1,15 +1,11 @@
-# AgentNews 架构总览
+﻿# AgentNews 鏋舵瀯鎬昏
 
-## 1. 项目定位
+## 1. 椤圭洰瀹氫綅
 
-AgentNews 不是单纯的新闻站点，也不是单纯的聊天页面，而是一个围绕新闻场景构建的前后端一体化 AI 应用：
-
-- 前端负责移动端新闻消费体验
-- 后端负责业务 API、缓存、检索、工作流和观测
-- 数据层同时覆盖结构化数据、缓存数据、向量索引和运行日志
-- Agent 层负责把“新闻问答”做成可解释、可观测、可评测的系统
-
-## 2. 分层架构
+AgentNews 涓嶆槸鍗曠函鐨勬柊闂荤珯鐐癸紝涔熶笉鏄崟绾殑鑱婂ぉ椤甸潰锛岃€屾槸涓€涓洿缁曟柊闂诲満鏅瀯寤虹殑鍓嶅悗绔竴浣撳寲 AI 搴旂敤锛?
+- 鍓嶇璐熻矗绉诲姩绔柊闂绘秷璐逛綋楠?- 鍚庣璐熻矗涓氬姟 API銆佺紦瀛樸€佹绱€佸伐浣滄祦鍜岃娴?- 鏁版嵁灞傚悓鏃惰鐩栫粨鏋勫寲鏁版嵁銆佺紦瀛樻暟鎹€佸悜閲忕储寮曞拰杩愯鏃ュ織
+- Agent 灞傝礋璐ｆ妸鈥滄柊闂婚棶绛斺€濆仛鎴愬彲瑙ｉ噴銆佸彲瑙傛祴銆佸彲璇勬祴鐨勭郴缁?
+## 2. 鍒嗗眰鏋舵瀯
 
 ```mermaid
 flowchart TB
@@ -68,16 +64,11 @@ flowchart TB
     Graph --> Observe
 ```
 
-## 3. 新闻业务主链路
-
-1. 前端请求分类、列表、详情或热榜
-2. FastAPI Router 只负责参数和响应包装
-3. `news_service` 负责缓存命中、数据库回源和视图聚合
-4. Redis 承担公共读缓存、热榜、浏览量增量和回刷
-5. MySQL 仍然是新闻和用户数据的权威来源
-
-## 4. Agent 主链路
-
+## 3. 鏂伴椈涓氬姟涓婚摼璺?
+1. 鍓嶇璇锋眰鍒嗙被銆佸垪琛ㄣ€佽鎯呮垨鐑
+2. FastAPI Router 鍙礋璐ｅ弬鏁板拰鍝嶅簲鍖呰
+3. `news_service` 璐熻矗缂撳瓨鍛戒腑銆佹暟鎹簱鍥炴簮鍜岃鍥捐仛鍚?4. Redis 鎵挎媴鍏叡璇荤紦瀛樸€佺儹姒溿€佹祻瑙堥噺澧為噺鍜屽洖鍒?5. MySQL 浠嶇劧鏄柊闂诲拰鐢ㄦ埛鏁版嵁鐨勬潈濞佹潵婧?
+## 4. Agent 涓婚摼璺?
 ```mermaid
 flowchart LR
     Q["Question"] --> QA["Query Analysis"]
@@ -93,8 +84,7 @@ flowchart LR
     FMT --> OUT["Answer / Sources / Trace / Follow-ups"]
 ```
 
-## 5. 会话与记忆链路
-
+## 5. 浼氳瘽涓庤蹇嗛摼璺?
 ```mermaid
 flowchart LR
     UI["AIChat"] --> SESS["sessionId"]
@@ -107,45 +97,32 @@ flowchart LR
     PROMPT --> AGENT["LangGraph Workflow"]
 ```
 
-## 6. 为什么是这套结构
+## 6. 涓轰粈涔堟槸杩欏缁撴瀯
 
-### 为什么后端要有 service 层
+### 涓轰粈涔堝悗绔鏈?service 灞?
+鍥犱负缂撳瓨銆佹暟鎹簱銆丵drant銆乀avily銆丩angGraph 閮戒笉鑳界洿鎺ュ湪 router 閲屾嫾鎺ャ€係ervice 灞傛妸涓氬姟閫昏緫銆佹绱㈢瓥鐣ュ拰瀹归敊鏀跺彛锛屾墠閫傚悎鍚庣画鎵╁睍銆?
+### 涓轰粈涔?Redis 涓嶅彧鍋氱畝鍗?get/set
 
-因为缓存、数据库、Qdrant、Tavily、LangGraph 都不能直接在 router 里拼接。Service 层把业务逻辑、检索策略和容错收口，才适合后续扩展。
+鏂伴椈绫荤郴缁熺殑楂橀闂涓嶆槸鈥滆兘涓嶈兘缂撳瓨鈥濓紝鑰屾槸锛?
+- 鍒楄〃鍜岃鎯呮€庝箞鍋?cache-aside
+- 娴忚閲忚繖绉嶉珮棰戝啓鎬庝箞鑱氬悎
+- 鐑鎬庝箞缁存姢
+- Redis 鏁呴殰鍚庢€庝箞鍥為€€
 
-### 为什么 Redis 不只做简单 get/set
+鎵€浠ラ」鐩噷鐨?Redis 鍚屾椂鎵挎媴鍏叡璇荤紦瀛樸€佺儹姒溿€佹祻瑙堥噺鑱氬悎鍜屼細璇濈姸鎬併€?
+### 涓轰粈涔堟湰鍦版绱笉鏄竴姝ュ埌浣嶅彧鍋氬悜閲忔绱?
+鍥犱负鏂伴椈闂鏃緷璧栧疄浣撹瘝绮剧‘鍛戒腑锛屼篃渚濊禆璇箟鍙洖锛岃繕渚濊禆鏃堕棿鍜屽垎绫昏繃婊ゃ€傞」鐩厛浠?lexical baseline 鍋氳捣锛屽啀鍗囩骇鍒?Qdrant 鍜?hybrid retrieval锛屽伐绋嬪彲瑙ｉ噴鎬ф洿寮猴紝涔熸洿閫傚悎闈㈣瘯璁茶堪銆?
+### 涓轰粈涔堝伐浣滄祦瑕佺敤 LangGraph 椋庢牸鑺傜偣
 
-新闻类系统的高频问题不是“能不能缓存”，而是：
+鍥犱负鏂伴椈闂瓟鏈€鎬曞够瑙夊拰涓嶅彲瑙ｉ噴銆傛妸閾捐矾鎷嗘垚鏄惧紡鑺傜偣锛屾墠鑳斤細
 
-- 列表和详情怎么做 cache-aside
-- 浏览量这种高频写怎么聚合
-- 热榜怎么维护
-- Redis 故障后怎么回退
-
-所以项目里的 Redis 同时承担公共读缓存、热榜、浏览量聚合和会话状态。
-
-### 为什么本地检索不是一步到位只做向量检索
-
-因为新闻问题既依赖实体词精确命中，也依赖语义召回，还依赖时间和分类过滤。项目先从 lexical baseline 做起，再升级到 Qdrant 和 hybrid retrieval，工程可解释性更强，也更适合面试讲述。
-
-### 为什么工作流要用 LangGraph 风格节点
-
-因为新闻问答最怕幻觉和不可解释。把链路拆成显式节点，才能：
-
-- 知道每一步做了什么
-- 把 verifier、filter、rerank 做成独立职责
-- 对接 LangSmith tracing 和后续评测
-
-## 7. 当前工程状态
-
-已经完成：
-
-- 移动端新闻前端体验升级
-- MySQL + Redis 主链路稳定
-- 热榜和浏览量增量回刷
-- 本地 lexical 检索
-- Tavily Web Search
-- Qdrant 本地向量召回
+- 鐭ラ亾姣忎竴姝ュ仛浜嗕粈涔?- 鎶?verifier銆乫ilter銆乺erank 鍋氭垚鐙珛鑱岃矗
+- 瀵规帴 LangSmith tracing 鍜屽悗缁瘎娴?
+## 7. 褰撳墠宸ョ▼鐘舵€?
+宸茬粡瀹屾垚锛?
+- 绉诲姩绔柊闂诲墠绔綋楠屽崌绾?- MySQL + Redis 涓婚摼璺ǔ瀹?- 鐑鍜屾祻瑙堥噺澧為噺鍥炲埛
+- 鏈湴 lexical 妫€绱?- Tavily Web Search
+- Qdrant 鏈湴鍚戦噺鍙洖
 - Local hybrid retrieval
 - Retrieval planner / route-aware filter / final rerank
 - Verifier / low-confidence fallback / no-evidence refusal
@@ -156,4 +133,4 @@ flowchart LR
 - planner baseline evaluation
 - response-level evaluation
 
-现在项目已经不是“概念方案”，而是一个可运行、可演示、可面试讲解的完整版本。
+鐜板湪椤圭洰宸茬粡涓嶆槸鈥滄蹇垫柟妗堚€濓紝鑰屾槸涓€涓彲杩愯銆佸彲婕旂ず銆佸彲闈㈣瘯璁茶В鐨勫畬鏁寸増鏈€?
