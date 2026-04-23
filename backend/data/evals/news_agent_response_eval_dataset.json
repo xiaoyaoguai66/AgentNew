@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "caseId": "response-local-summary",
+      "title": "本地总结类回答应给出来源和追问",
+      "question": "根据本地新闻库总结一下科技热点",
+      "mode": "brief",
+      "timeRange": "all",
+      "category": "technology",
+      "allowedStatuses": ["accepted", "guarded"],
+      "minSources": 1,
+      "maxSources": 6,
+      "requireFollowUps": true,
+      "requireWorkflowTrace": true,
+      "requireNonEmptyReply": true,
+      "note": "本地总结类问题通常至少要有来源、trace 和 follow-up。"
+    },
+    {
+      "caseId": "response-web-latest",
+      "title": "最新动态类回答应保持结构完整",
+      "question": "今天最新的卫星发射计划有什么进展",
+      "mode": "brief",
+      "timeRange": "24h",
+      "category": "general",
+      "allowedStatuses": ["accepted", "guarded"],
+      "minSources": 1,
+      "maxSources": 6,
+      "requireFollowUps": true,
+      "requireWorkflowTrace": true,
+      "requireNonEmptyReply": true,
+      "note": "最新动态场景至少应返回结构完整的回答合同。"
+    },
+    {
+      "caseId": "response-compare",
+      "title": "对比类问题应保留 trace 和 follow-up",
+      "question": "对比一下最近一周国际新闻和科技新闻的热点差异",
+      "mode": "compare",
+      "timeRange": "7d",
+      "category": "general",
+      "allowedStatuses": ["accepted", "guarded"],
+      "minSources": 1,
+      "maxSources": 6,
+      "requireFollowUps": true,
+      "requireWorkflowTrace": true,
+      "requireNonEmptyReply": true,
+      "note": "对比类问题重点验证最终回答合同，不要求固定文本。"
+    }
+  ]
+}

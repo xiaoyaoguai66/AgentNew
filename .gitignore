@@ -1,0 +1,16 @@
+.env
+.env.local
+.venv/
+backend/.venv/
+.idea/
+backend/.idea/
+.cursor/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+frontend/dist/
+frontend/node_modules/
+debug-*.log
+backend/data/qdrant/
+backend/data/agent_runs/
+backend/data/evals/*.jsonl

@@ -37,7 +37,7 @@ async def create_token(db:AsyncSession ,user_id : int):
     user_token = result.scalar_one_or_none()
     if  user_token:
         user_token.token = token
-        user_token.expire_at = expire_at
+        user_token.expires_at = expire_at
         await db.commit()
         await db.refresh(user_token)
     else:

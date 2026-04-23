@@ -1,264 +1,251 @@
 <template>
-  <div class="history-container">
+  <div class="collection-page">
     <van-nav-bar
       title="浏览历史"
       left-text="返回"
       left-arrow
-      @click-left="onClickLeft"
-      right-text="清空"
-      @click-right="onClickClear"
       fixed
-    />
-    
-    <div class="history-list" v-if="historyStore.getHistory.length">
-      <div class="history-item" v-for="item in historyStore.getHistory" :key="item.id">
-        <van-cell @click="goToNewsDetail(item.id)" :border="false">
-          <template #title>
-            <div class="news-item">
-              <div class="news-image" v-if="item.image">
-                <img :src="item.image" :alt="item.title">
-              </div>
-              <div class="news-info">
-                <div class="news-title">{{ item.title }}</div>
-                <div class="news-meta">
-                  <span>{{ item.author }}</span>
-                  <span>{{ item.publishTime }}</span>
-                  <span>浏览时间: {{ item.viewTime }}</span>
-                </div>
-              </div>
-            </div>
-          </template>
-        </van-cell>
-        <van-button 
-          class="delete-btn" 
-          type="danger" 
-          size="mini" 
-          icon="cross"
-          @click="confirmDelete(item.id)"
-        ></van-button>
-      </div>
+      @click-left="onClickLeft"
+    >
+      <template #right>
+        <button v-if="items.length" type="button" class="nav-clear" @click="onClickClear">
+          清空
+        </button>
+      </template>
+    </van-nav-bar>
+
+    <div class="collection-shell">
+      <section class="collection-hero history-hero">
+        <p class="collection-kicker">阅读轨迹</p>
+        <h1>最近看过的新闻</h1>
+        <p class="collection-copy">
+          共 {{ items.length }} 条历史。
+          {{ isLogin ? '已优先同步账号下的阅读记录。' : '当前展示本地浏览记录，登录后可同步账号数据。' }}
+        </p>
+      </section>
+
+      <section v-if="loading" class="collection-card">
+        <div v-for="index in 3" :key="index" class="collection-skeleton skeleton" />
+      </section>
+
+      <section v-else-if="items.length" class="collection-card list-card">
+        <saved-news-card
+          v-for="item in items"
+          :key="item.id"
+          :news="item"
+          secondary-label="浏览时间"
+          :secondary-value="item.viewTime"
+          action-text="删除"
+          @select="goToNewsDetail"
+          @action="confirmDelete"
+        />
+      </section>
+
+      <section v-else class="collection-card empty-card">
+        <van-empty description="暂无浏览历史" />
+        <button
+          v-if="!isLogin"
+          type="button"
+          class="primary-button"
+          @click="goToLogin"
+        >
+          去登录
+        </button>
+      </section>
     </div>
-    
-    <van-empty v-else description="暂无浏览历史" />
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useHistoryStore } from '../store/modules/history';
-import { showDialog } from 'vant';
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { showDialog, showToast } from 'vant'
 
-const router = useRouter();
-const historyStore = useHistoryStore();
+import SavedNewsCard from '../components/SavedNewsCard.vue'
+import { useHistoryStore } from '../store/modules/history'
+import { useUserStore } from '../store/user'
 
-// 返回上一页
-const onClickLeft = () => {
-  router.back();
-};
 
-// 跳转到新闻详情
-const goToNewsDetail = (id) => {
-  router.push(`/news/detail/${id}`);
-};
+const router = useRouter()
+const historyStore = useHistoryStore()
+const userStore = useUserStore()
 
-// 删除单条历史记录
-const removeHistory = async (id) => {
+const loading = ref(true)
+const items = computed(() => historyStore.getHistory)
+const isLogin = computed(() => userStore.getLoginStatus)
+
+function onClickLeft() {
+  router.back()
+}
+
+function goToLogin() {
+  router.push('/login')
+}
+
+function goToNewsDetail(id) {
+  router.push(`/news/detail/${id}`)
+}
+
+async function hydrateHistory() {
+  loading.value = true
+  historyStore.loadHistory()
+
   try {
-    const result = await historyStore.removeHistoryApi(id);
-    console.log('删除单条历史记录结果:', result);
-    
-    // 如果API请求失败且不是本地操作，则显示错误提示
-    if (!result.success && !result.isLocal) {
-      showDialog({
-        title: '提示',
-        message: result.message || '删除失败，请稍后重试',
-      });
+    const result = await historyStore.getHistoryListApi()
+    if (!result?.success) {
+      historyStore.loadHistory()
     }
   } catch (error) {
-    console.error('删除历史记录失败:', error);
-    // 出错时仍然尝试本地删除
-    // historyStore.removeHistory(id);
+    historyStore.loadHistory()
+  } finally {
+    loading.value = false
   }
-};
+}
 
-// 确认删除
-const confirmDelete = (id) => {
+async function removeHistory(id) {
+  const result = await historyStore.removeHistoryApi(id)
+  if (result.success) {
+    showToast({
+      message: '已移除历史记录',
+      position: 'bottom',
+    })
+    return
+  }
+
+  showToast({
+    message: result.message || '删除失败，请稍后重试',
+    position: 'bottom',
+  })
+}
+
+function confirmDelete(id) {
   showDialog({
     title: '提示',
     message: '确定要删除这条浏览记录吗？',
     showCancelButton: true,
   }).then((action) => {
     if (action === 'confirm') {
-      removeHistory(id);
+      removeHistory(id)
     }
-  });
-};
+  })
+}
 
-// 清空历史记录
-const onClickClear = async () => {
+function onClickClear() {
   showDialog({
     title: '提示',
     message: '确定要清空所有浏览历史吗？',
     showCancelButton: true,
   }).then(async (action) => {
-    if (action === 'confirm') {
-      try {
-        const result = await historyStore.clearHistoryApi();
-        console.log('清空历史记录结果:', result);
-        
-        // 如果API请求失败且不是本地操作，则显示错误提示
-        if (!result.success && !result.isLocal) {
-          showDialog({
-            title: '提示',
-            message: result.message || '清空失败，请稍后重试',
-          });
-        }
-      } catch (error) {
-        console.error('清空历史记录失败:', error);
-        // 出错时仍然尝试本地清空
-        // historyStore.clearHistory();
-      }
+    if (action !== 'confirm') {
+      return
     }
-  });
-};
 
-// 组件挂载时加载历史记录
-onMounted(async () => {
-  // 先尝试从API获取浏览历史
-  try {
-    const result = await historyStore.getHistoryListApi();
-    console.log('浏览历史页面：API获取结果', result);
-    
-    // 如果API请求失败或用户未登录，则从本地加载
-    if (!result || !result.success) {
-      historyStore.loadHistory();
+    const result = await historyStore.clearHistoryApi()
+    if (result?.success) {
+      showToast({
+        message: '浏览历史已清空',
+        position: 'bottom',
+      })
+      return
     }
-  } catch (error) {
-    console.error('浏览历史页面：API请求异常', error);
-    // 出错时从本地加载
-    historyStore.loadHistory();
-  }
-});
+
+    showToast({
+      message: result?.message || '清空失败，请稍后重试',
+      position: 'bottom',
+    })
+  })
+}
+
+onMounted(async () => {
+  await hydrateHistory()
+})
 </script>
 
 <style scoped>
-.history-container {
-  padding-top: 46px;
-  padding-bottom: 20px;
-  background-color: #f7f8fa;
+.collection-page {
   min-height: 100vh;
+  padding-top: 46px;
+  background:
+    radial-gradient(circle at top, rgba(15, 23, 42, 0.08), transparent 28%),
+    linear-gradient(180deg, #f6f7fb 0%, #edf1f7 100%);
 }
 
-.history-list {
-  padding: 10px;
+.collection-shell {
+  padding: 16px;
 }
 
-.news-item {
-  display: flex;
-  padding: 10px 0;
+.collection-hero,
+.collection-card {
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
 }
 
-.news-image {
-  width: 120px;
-  height: 80px;
-  margin-right: 12px;
-  flex-shrink: 0;
+.history-hero {
+  color: #fff;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.14), transparent 34%),
+    linear-gradient(135deg, #0f172a 0%, #1f2937 62%, #334155 100%);
 }
 
-.news-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 4px;
+.collection-kicker {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.news-info {
-  flex: 1;
+.collection-hero h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.35;
+}
+
+.collection-copy {
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.nav-clear,
+.primary-button {
+  border: 0;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nav-clear {
+  background: transparent;
+  color: #0f172a;
+}
+
+.primary-button {
+  padding: 10px 16px;
+  background: #111827;
+  color: #fff;
+}
+
+.list-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 12px;
 }
 
-.news-title {
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1.4;
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.news-meta {
-  font-size: 12px;
-  color: #999;
+.empty-card {
   display: flex;
-  flex-wrap: wrap;
-}
-
-.news-meta span {
-  margin-right: 10px;
-}
-
-.delete-button {
-  width: 20px;
-  height: 20px;
-  background-color: #ee0a24;
-  border-radius: 50%;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-right: 10px;
+  gap: 14px;
 }
 
-.delete-btn {
-  height: 100%;
-  width: 65px;
-}
-
-.van-swipe-cell {
-  margin-bottom: 8px;
-}
-
-.history-item {
-  position: relative;
-  margin-bottom: 10px;
-  background-color: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  z-index: 10;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.delete-icon {
-  position: absolute;
-  top: 50%;
-  right: 15px;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f2f3f5;
-  border-radius: 50%;
-  z-index: 2;
+.collection-skeleton {
+  height: 104px;
+  border-radius: 20px;
+  margin-bottom: 12px;
 }
 </style>

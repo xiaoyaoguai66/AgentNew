@@ -1,69 +1,49 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import true, null
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud import news
-from crud import news_cache
-
 from config.db_conf import get_db
+from services import news_service
+from utils.response import success_response
 
-#创建APIRouter实例，设置前缀和标签
+
 router = APIRouter(prefix="/api/news", tags=["news"])
 
+
 @router.get("/categories")
-async def get_categories(skip: int = 0, limit: int = 100,db:AsyncSession=Depends(get_db)):
-    categories = await news_cache.get_categories(db, skip, limit)
-    return {
-        "code":200,
-        "msg":"获取分类成功",
-        "data":categories
-    }
+async def get_categories(
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db),
+):
+    categories = await news_service.get_categories(db, skip, limit)
+    return success_response(message="获取分类成功", data=categories)
+
 
 @router.get("/list")
 async def get_news(
-        category_id:int = Query(...,alias="categoryId") ,
-        db:AsyncSession=Depends(get_db),
-        page: int = 1,
-        page_size: int = Query(10, le=100, alias="pageSize"),
+    category_id: int = Query(..., alias="categoryId"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100, alias="pageSize"),
+    db: AsyncSession = Depends(get_db),
 ):
-    #分析规则，查询新闻列表 计算总量，计算是否还有更多
-    skip = (page - 1) * page_size
-    total =await news.get_news_count(db,category_id)
-    news_list = await news_cache.get_news_list(db,category_id, skip, page_size)
-    han_more = (skip+page_size)<total
-    return {
-        "code":200,
-        "message":"success",
-        "data":{
-            "list":news_list,
-            "total": total,
-            "hanMore": han_more
-        },
-
-    }
+    news_page = await news_service.get_news_list(db, category_id, page, page_size)
+    return success_response(message="获取新闻列表成功", data=news_page)
 
 
 @router.get("/detail")
-async def get_news_detail(db:AsyncSession = Depends(get_db),news_id:int = Query(...,alias="id")):
-    news_detail = await news.get_news_detail(db, news_id)
-    if not news_detail:
-        raise HTTPException(status_code=404,detail="新闻不存在")
-    views_res = await news.increase_news_view(db, news_detail.id)
-    if not views_res:
-        raise HTTPException(status_code=404,detail="新闻不存在")
-    related_news = await news.get_related_news(db, news_detail.category_id,news_detail.id)
-    return {
-        "code":200,
-        "message":"success",
-        "data":{
-            "id":news_detail.id,
-            "title":  news_detail.title,
-            "content": news_detail.content,
-            "image": news_detail.image,
-            "author": news_detail.author,
-            "publish_time": news_detail.publish_time,
-            "categoryId": news_detail.category_id,
-            "views": news_detail.views,
-            "relatedNews": related_news,
-        }
-    }
+async def get_news_detail(
+    news_id: int = Query(..., alias="id"),
+    db: AsyncSession = Depends(get_db),
+):
+    news_detail = await news_service.get_news_detail(db, news_id)
+    return success_response(message="获取新闻详情成功", data=news_detail)
+
+
+@router.get("/hot")
+async def get_hot_news(
+    category_id: int | None = Query(None, alias="categoryId"),
+    limit: int = Query(10, ge=1, le=20),
+    db: AsyncSession = Depends(get_db),
+):
+    hot_news = await news_service.get_hot_news(db, category_id, limit)
+    return success_response(message="获取热门新闻成功", data=hot_news)

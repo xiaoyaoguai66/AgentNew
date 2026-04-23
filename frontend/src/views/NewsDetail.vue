@@ -1,70 +1,139 @@
 <template>
-  <div class="news-detail">
+  <div class="news-detail-page">
     <van-nav-bar
       title="新闻详情"
       left-text="返回"
       left-arrow
-      @click-left="onClickLeft"
       fixed
+      @click-left="onClickLeft"
     />
-    
-    <div class="detail-content" v-if="newsStore.newsDetail.id">
-      <div class="title-container">
-        <h1 class="title">{{ newsStore.newsDetail.title }}</h1>
-        <van-button 
-          class="favorite-btn" 
-          :icon="isFavorite ? 'star' : 'star-o'" 
-          :class="{ 'is-favorite': isFavorite }"
-          @click="toggleFavorite"
-        />
-      </div>
-      
-      <div class="info">
-        <span>{{ newsStore.newsDetail.author }}</span>
-        <span>{{ newsStore.newsDetail.publishTime }}</span>
-        <span>{{ newsStore.newsDetail.views }} 阅读</span>
-      </div>
-      
-      <div class="cover" v-if="newsStore.newsDetail.image">
-        <img :src="newsStore.newsDetail.image" :alt="newsStore.newsDetail.title">
-      </div>
-      
-      <div class="content">
-        <p v-for="(paragraph, index) in contentParagraphs" :key="index">
-          {{ paragraph }}
-        </p>
-      </div>
-      
-      <div class="related-news" v-if="newsStore.newsDetail.relatedNews?.length">
-        <h3>相关推荐</h3>
-        <div class="related-list">
-          <div 
-            class="related-item" 
-            v-for="item in newsStore.newsDetail.relatedNews" 
-            :key="item.id"
-            @click="goToRelatedNews(item.id)"
-          >
-            <div class="related-image">
-              <img :src="item.image" :alt="item.title">
-            </div>
-            <div class="related-title">{{ item.title }}</div>
+
+    <div class="detail-shell">
+      <section v-if="newsStore.detailLoading" class="detail-card">
+        <div class="detail-skeleton-title skeleton" />
+        <div class="detail-skeleton-meta skeleton" />
+        <div class="detail-skeleton-cover skeleton" />
+        <div class="detail-skeleton-paragraph skeleton" />
+        <div class="detail-skeleton-paragraph skeleton short" />
+        <div class="detail-skeleton-paragraph skeleton" />
+      </section>
+
+      <section v-else-if="newsStore.detailError" class="detail-card error-panel">
+        <h2>新闻加载失败</h2>
+        <p>{{ newsStore.detailError }}</p>
+        <button type="button" class="primary-button" @click="loadNewsDetail(newsId)">
+          重新加载
+        </button>
+      </section>
+
+      <template v-else-if="newsDetail.id">
+        <section class="detail-card hero-card">
+          <div class="eyebrow-row">
+            <span class="category-pill">{{ categoryLabel }}</span>
+            <button
+              type="button"
+              class="favorite-button"
+              :class="{ active: isFavorite }"
+              @click="toggleFavorite"
+            >
+              {{ isFavorite ? '已收藏' : '收藏' }}
+            </button>
           </div>
-        </div>
-      </div>
+
+          <h1 class="detail-title">{{ newsDetail.title }}</h1>
+          <p v-if="newsDetail.description" class="detail-summary">
+            {{ newsDetail.description }}
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-chip">
+              <span class="meta-label">作者</span>
+              <span class="meta-value">{{ newsDetail.author || 'AgentNews' }}</span>
+            </div>
+            <div class="meta-chip">
+              <span class="meta-label">发布时间</span>
+              <span class="meta-value">{{ publishTime }}</span>
+            </div>
+            <div class="meta-chip">
+              <span class="meta-label">阅读量</span>
+              <span class="meta-value">{{ viewCount }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section v-if="newsDetail.image" class="detail-card cover-card">
+          <img class="detail-cover" :src="newsDetail.image" :alt="newsDetail.title">
+        </section>
+
+        <section class="detail-card article-card">
+          <div class="section-header">
+            <p class="section-eyebrow">正文阅读</p>
+            <h2>报道内容</h2>
+          </div>
+
+          <div class="article-content">
+            <p v-for="(paragraph, index) in contentParagraphs" :key="index">
+              {{ paragraph }}
+            </p>
+          </div>
+        </section>
+
+        <section class="detail-card insight-card">
+          <p class="section-eyebrow">来源延展</p>
+          <h2>作为新闻 Agent 的可引用来源</h2>
+          <p class="insight-copy">
+            当前详情页已经接入真实浏览量、相关推荐与收藏状态。后续接 Agent 时，这一页可以继续扩展成“回答来源展示页”，承接证据片段、引用链接和相关新闻链路。
+          </p>
+        </section>
+
+        <section v-if="relatedNews.length" class="detail-card related-card">
+          <div class="section-header">
+            <p class="section-eyebrow">继续阅读</p>
+            <h2>相关推荐</h2>
+          </div>
+
+          <div class="related-list">
+            <button
+              v-for="item in relatedNews"
+              :key="item.id"
+              type="button"
+              class="related-item click-effect"
+              @click="goToRelatedNews(item.id)"
+            >
+              <div class="related-image" :class="{ placeholder: !item.image }">
+                <img v-if="item.image" :src="item.image" :alt="item.title">
+                <span v-else>NEWS</span>
+              </div>
+              <div class="related-body">
+                <p class="related-title">{{ item.title }}</p>
+                <div class="related-meta">
+                  <span>{{ formatPublishTime(item.publishTime) }}</span>
+                  <span>{{ formatViewCount(item.views) }} 阅读</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </section>
+      </template>
+
+      <section v-else class="detail-card">
+        <van-empty description="暂无新闻内容" />
+      </section>
     </div>
-    
-    <van-empty v-else description="加载中..." />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useNewsStore } from '../store/modules/news'
-import { useHistoryStore } from '../store/modules/history'
-import { useFavoriteStore } from '../store/modules/favorite'
-import { useUserStore } from '../store/user'
 import { showToast } from 'vant'
+
+import { useFavoriteStore } from '../store/modules/favorite'
+import { useHistoryStore } from '../store/modules/history'
+import { useNewsStore } from '../store/modules/news'
+import { useUserStore } from '../store/user'
+import { formatPublishTime, formatViewCount } from '../utils/news'
+
 
 const route = useRoute()
 const router = useRouter()
@@ -73,35 +142,88 @@ const historyStore = useHistoryStore()
 const favoriteStore = useFavoriteStore()
 const userStore = useUserStore()
 
-// 获取路由参数中的新闻ID
-const newsId = computed(() => Number(route.params.id))
+const newsId = computed(() => Number(route.params.id || 0))
+const newsDetail = computed(() => newsStore.newsDetail || {})
+const relatedNews = computed(() => newsDetail.value.relatedNews || [])
+const categoryLabel = computed(() => newsStore.getCategoryName(newsDetail.value.categoryId) || '新闻')
+const publishTime = computed(() => formatPublishTime(newsDetail.value.publishTime))
+const viewCount = computed(() => `${formatViewCount(newsDetail.value.views)} 阅读`)
 
-// 将内容拆分为段落
 const contentParagraphs = computed(() => {
-  if (!newsStore.newsDetail.content) return []
-  return newsStore.newsDetail.content.split('\n\n').filter(p => p.trim())
+  const content = newsDetail.value.content || ''
+  if (!content) {
+    return []
+  }
+
+  const paragraphs = content
+    .split(/\n+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+
+  return paragraphs.length ? paragraphs : [content]
 })
 
-// 返回上一页
-const onClickLeft = () => {
+const isFavorite = computed(() => favoriteStore.isFavorite(newsId.value))
+
+function onClickLeft() {
   router.back()
 }
 
-// 跳转到相关新闻
-const goToRelatedNews = (id) => {
-  router.push(`/news/detail/${id}`)
+async function syncHistoryRecord() {
+  if (!userStore.getLoginStatus || !newsDetail.value.id) {
+    return
+  }
+
+  try {
+    await historyStore.addHistoryApi(newsDetail.value.id)
+  } catch (error) {
+    console.error('记录浏览历史失败:', error)
+  }
 }
 
-// 判断当前新闻是否已收藏
-const isFavorite = computed(() => {
-  return favoriteStore.isFavorite(newsId.value)
-})
+async function syncFavoriteStatus() {
+  favoriteStore.loadFavorites()
 
-// 切换收藏状态
-const toggleFavorite = async () => {
-  // 判断用户是否已登录
+  if (!userStore.getLoginStatus || !newsDetail.value.id) {
+    return
+  }
+
+  const result = await favoriteStore.checkFavoriteStatusApi(newsDetail.value.id)
+  if (!result?.success || result.isLocal) {
+    return
+  }
+
+  if (result.isFavorite && !favoriteStore.isFavorite(newsDetail.value.id)) {
+    favoriteStore.addFavorite(newsDetail.value)
+    return
+  }
+
+  if (!result.isFavorite && favoriteStore.isFavorite(newsDetail.value.id)) {
+    favoriteStore.removeFavorite(newsDetail.value.id)
+  }
+}
+
+async function loadNewsDetail(targetId) {
+  if (!targetId) {
+    return
+  }
+
+  try {
+    await newsStore.getNewsDetail(targetId)
+    window.scrollTo({ top: 0, behavior: 'auto' })
+    await syncHistoryRecord()
+    await syncFavoriteStatus()
+  } catch (error) {
+    console.error('新闻详情加载失败:', error)
+  }
+}
+
+async function toggleFavorite() {
+  if (!newsDetail.value.id) {
+    return
+  }
+
   if (!userStore.getLoginStatus) {
-    // 未登录则跳转到登录页
     showToast({
       message: '请先登录后再收藏',
       position: 'bottom',
@@ -109,146 +231,225 @@ const toggleFavorite = async () => {
     router.push('/login')
     return
   }
-  
-  // 已登录则调用API切换收藏状态
-  const status = await favoriteStore.toggleFavorite(newsStore.newsDetail)
-  
+
+  const status = await favoriteStore.toggleFavorite(newsDetail.value)
+
   if (status === true) {
     showToast({
       message: '已添加到收藏',
       position: 'bottom',
     })
-  } else if (status === false) {
+    return
+  }
+
+  if (status === false) {
     showToast({
       message: '已取消收藏',
       position: 'bottom',
     })
-  } else {
-    // status为null表示操作失败
-    showToast({
-      message: '操作失败，请稍后重试',
-      position: 'bottom',
-    })
+    return
   }
+
+  showToast({
+    message: '操作失败，请稍后重试',
+    position: 'bottom',
+  })
 }
 
-// 组件挂载时获取新闻详情并添加到浏览历史
+function goToRelatedNews(id) {
+  if (!id || id === newsId.value) {
+    return
+  }
+
+  router.push(`/news/detail/${id}`)
+}
+
 onMounted(async () => {
-  await newsStore.getNewsDetail(newsId.value)
-  
-  // 添加到浏览历史
-  if (newsStore.newsDetail.id) {
-    // 先调用API记录浏览历史
-    if (userStore.getLoginStatus) {
-      try {
-        const result = await historyStore.addHistoryApi(newsStore.newsDetail.id);
-        console.log('记录浏览历史API结果:', result);
-      } catch (error) {
-        console.error('记录浏览历史API失败:', error);
-      }
-    }
-    
-    // 无论API是否成功，都添加到本地浏览历史
-    // historyStore.addHistory(newsStore.newsDetail);
-  }
-  
-  // 加载收藏数据
   favoriteStore.loadFavorites()
-  
-  // 检查文章收藏状态
-  if (userStore.getLoginStatus && newsStore.newsDetail.id) {
-    const result = await favoriteStore.checkFavoriteStatusApi(newsStore.newsDetail.id)
-    if (result.success && !result.isLocal) {
-      // 如果API请求成功且不是本地状态，更新本地收藏状态
-      if (result.isFavorite && !favoriteStore.isFavorite(newsStore.newsDetail.id)) {
-        favoriteStore.addFavorite(newsStore.newsDetail)
-      } else if (!result.isFavorite && favoriteStore.isFavorite(newsStore.newsDetail.id)) {
-        favoriteStore.removeFavorite(newsStore.newsDetail.id)
-      }
-    }
-  }
+  await loadNewsDetail(newsId.value)
 })
+
+watch(
+  () => route.params.id,
+  async (value, oldValue) => {
+    if (!value || value === oldValue) {
+      return
+    }
+
+    await loadNewsDetail(Number(value))
+  },
+)
 </script>
 
 <style scoped>
-.news-detail {
-  padding-top: 46px;
-  background-color: #fff;
+.news-detail-page {
   min-height: 100vh;
+  padding-top: 46px;
+  background:
+    radial-gradient(circle at top, rgba(183, 28, 28, 0.08), transparent 28%),
+    linear-gradient(180deg, #f5f7fb 0%, #eef2f8 100%);
 }
 
-.detail-content {
-  padding: 16px;
+.detail-shell {
+  padding: 16px 16px 32px;
 }
 
-.title-container {
+.detail-card {
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.hero-card {
+  background:
+    radial-gradient(circle at top right, rgba(183, 28, 28, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(255, 250, 249, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
+}
+
+.eyebrow-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.title {
-  font-size: 22px;
-  font-weight: bold;
-  line-height: 1.4;
-  margin: 0;
-  flex: 1;
-}
-
-.favorite-btn {
-  flex-shrink: 0;
-  margin-left: 10px;
-  padding: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-}
-
-.favorite-btn.is-favorite {
-  color: #ff9500;
-}
-
-.info {
-  display: flex;
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(183, 28, 28, 0.09);
+  color: #b71c1c;
   font-size: 12px;
-  color: #999;
-  margin-bottom: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
-.info span {
-  margin-right: 12px;
+.favorite-button,
+.primary-button {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #111827;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.cover {
-  margin-bottom: 16px;
+.favorite-button.active {
+  background: #b71c1c;
 }
 
-.cover img {
-  width: 100%;
-  border-radius: 4px;
+.detail-title {
+  margin: 0;
+  color: #111827;
+  font-size: 28px;
+  line-height: 1.42;
+  font-weight: 800;
 }
 
-.content {
-  font-size: 16px;
+.detail-summary {
+  margin: 14px 0 0;
+  color: #5d6776;
+  font-size: 15px;
   line-height: 1.8;
-  color: #333;
 }
 
-.content p {
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.meta-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.92);
+}
+
+.meta-label {
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.meta-value {
+  color: #111827;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.cover-card {
+  padding: 10px;
+}
+
+.detail-cover {
+  width: 100%;
+  display: block;
+  border-radius: 18px;
+}
+
+.section-header {
   margin-bottom: 16px;
+}
+
+.section-eyebrow {
+  margin: 0 0 8px;
+  color: #b71c1c;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.article-content {
+  color: #1f2937;
+  font-size: 17px;
+  line-height: 1.95;
+}
+
+.article-content p {
+  margin: 0 0 18px;
   text-align: justify;
 }
 
-.related-news {
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 8px solid #f5f5f5;
+.article-content p:last-child {
+  margin-bottom: 0;
 }
 
-.related-news h3 {
-  font-size: 18px;
-  margin: 0 0 16px;
+.insight-card {
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(31, 41, 55, 0.98) 100%);
+  color: #fff;
+}
+
+.insight-card .section-eyebrow,
+.insight-card h2,
+.insight-copy {
+  color: inherit;
+}
+
+.insight-copy {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  line-height: 1.8;
 }
 
 .related-list {
@@ -259,26 +460,123 @@ onMounted(async () => {
 
 .related-item {
   display: flex;
-  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.92);
+  text-align: left;
 }
 
 .related-image {
-  width: 80px;
-  height: 60px;
-  margin-right: 12px;
+  width: 92px;
+  height: 92px;
   flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #e6ebf2;
 }
 
 .related-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 4px;
+}
+
+.related-image.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f6b7a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.related-body {
+  flex: 1;
+  min-width: 0;
 }
 
 .related-title {
+  margin: 0 0 12px;
+  color: #111827;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 700;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.related-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: #7b8794;
+  font-size: 12px;
+}
+
+.error-panel {
+  text-align: center;
+}
+
+.error-panel h2 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 22px;
+}
+
+.error-panel p {
+  margin: 0 0 16px;
+  color: #687588;
   font-size: 14px;
-  line-height: 1.4;
-  flex: 1;
+}
+
+.detail-skeleton-title,
+.detail-skeleton-meta,
+.detail-skeleton-cover,
+.detail-skeleton-paragraph {
+  border-radius: 16px;
+}
+
+.detail-skeleton-title {
+  height: 34px;
+  margin-bottom: 16px;
+}
+
+.detail-skeleton-meta {
+  height: 68px;
+  margin-bottom: 16px;
+}
+
+.detail-skeleton-cover {
+  height: 220px;
+  margin-bottom: 16px;
+}
+
+.detail-skeleton-paragraph {
+  height: 18px;
+  margin-bottom: 12px;
+}
+
+.detail-skeleton-paragraph.short {
+  width: 72%;
+}
+
+@media (max-width: 480px) {
+  .meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-title {
+    font-size: 24px;
+  }
+
+  .article-content {
+    font-size: 16px;
+  }
 }
 </style>

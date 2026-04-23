@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+
 const routes = [
   {
     path: '/',
-    redirect: '/home'
+    redirect: '/home',
   },
   {
     path: '/login',
@@ -11,8 +12,8 @@ const routes = [
     component: () => import('../views/Login.vue'),
     meta: {
       title: '登录',
-      keepAlive: false
-    }
+      keepAlive: false,
+    },
   },
   {
     path: '/register',
@@ -20,8 +21,8 @@ const routes = [
     component: () => import('../views/Register.vue'),
     meta: {
       title: '注册',
-      keepAlive: false
-    }
+      keepAlive: false,
+    },
   },
   {
     path: '/home',
@@ -29,8 +30,8 @@ const routes = [
     component: () => import('../views/Home.vue'),
     meta: {
       title: '首页',
-      keepAlive: true
-    }
+      keepAlive: true,
+    },
   },
   {
     path: '/news/detail/:id',
@@ -38,8 +39,8 @@ const routes = [
     component: () => import('../views/NewsDetail.vue'),
     meta: {
       title: '新闻详情',
-      keepAlive: false
-    }
+      keepAlive: false,
+    },
   },
   {
     path: '/history',
@@ -47,8 +48,8 @@ const routes = [
     component: () => import('../views/History.vue'),
     meta: {
       title: '浏览历史',
-      keepAlive: false
-    }
+      keepAlive: false,
+    },
   },
   {
     path: '/favorite',
@@ -56,8 +57,8 @@ const routes = [
     component: () => import('../views/Favorite.vue'),
     meta: {
       title: '我的收藏',
-      keepAlive: false
-    }
+      keepAlive: false,
+    },
   },
   {
     path: '/category',
@@ -65,17 +66,17 @@ const routes = [
     component: () => import('../views/Category.vue'),
     meta: {
       title: '分类',
-      keepAlive: true
-    }
+      keepAlive: true,
+    },
   },
   {
     path: '/aichat',
     name: 'AIChat',
     component: () => import('../views/AIChat.vue'),
     meta: {
-      title: 'AI问答',
-      keepAlive: true
-    }
+      title: '新闻 AI 助手',
+      keepAlive: true,
+    },
   },
   {
     path: '/my',
@@ -83,17 +84,17 @@ const routes = [
     component: () => import('../views/My.vue'),
     meta: {
       title: '我的',
-      keepAlive: true
-    }
+      keepAlive: true,
+    },
   },
   {
     path: '/profile',
     name: 'Profile',
     component: () => import('../views/Profile.vue'),
     meta: {
-      title: '个人信息',
-      keepAlive: false
-    }
+      title: '个人资料',
+      keepAlive: false,
+    },
   },
   {
     path: '/settings',
@@ -101,23 +102,22 @@ const routes = [
     component: () => import('../views/Settings.vue'),
     meta: {
       title: '设置',
-      keepAlive: false
-    }
+      keepAlive: false,
+    },
   },
 ]
 
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 })
 
-// 全局前置守卫
+
 router.beforeEach((to, from, next) => {
-  // 设置页面标题
-  document.title = to.meta.title || '新闻资讯'
-  
-  // 直接允许访问所有页面
+  document.title = to.meta.title || 'AgentNews'
   next()
 })
+
 
 export default router

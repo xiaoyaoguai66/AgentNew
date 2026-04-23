@@ -1,206 +1,270 @@
 <template>
-  <div class="favorite-container">
+  <div class="collection-page">
     <van-nav-bar
       title="我的收藏"
       left-text="返回"
       left-arrow
-      @click-left="onClickLeft"
-      right-text="清空"
-      @click-right="onClickClear"
       fixed
-    />
-    
-    <div class="favorite-list" v-if="favoriteStore.getFavorites.length">
-      <div class="favorite-item" v-for="item in favoriteStore.getFavorites" :key="item.id">
-        <van-cell @click="goToNewsDetail(item.id)" :border="false">
-          <template #title>
-            <div class="news-item">
-              <div class="news-image" v-if="item.image">
-                <img :src="item.image" :alt="item.title">
-              </div>
-              <div class="news-info">
-                <div class="news-title">{{ item.title }}</div>
-                <div class="news-meta">
-                  <span>{{ item.author }}</span>
-                  <span>{{ item.publishTime }}</span>
-                  <span>收藏时间: {{ item.favoriteTime }}</span>
-                </div>
-              </div>
-            </div>
-          </template>
-        </van-cell>
-        <van-button 
-          class="delete-btn" 
-          type="danger" 
-          size="mini" 
-          icon="cross"
-          @click="confirmDelete(item.id)"
-        ></van-button>
-      </div>
+      @click-left="onClickLeft"
+    >
+      <template #right>
+        <button v-if="items.length" type="button" class="nav-clear" @click="onClickClear">
+          清空
+        </button>
+      </template>
+    </van-nav-bar>
+
+    <div class="collection-shell">
+      <section class="collection-hero">
+        <p class="collection-kicker">内容沉淀</p>
+        <h1>重点新闻收藏夹</h1>
+        <p class="collection-copy">
+          共 {{ items.length }} 条收藏。
+          {{ isLogin ? '已优先同步账号下的收藏内容。' : '当前展示本地收藏，登录后可同步账号数据。' }}
+        </p>
+      </section>
+
+      <section v-if="loading" class="collection-card">
+        <div v-for="index in 3" :key="index" class="collection-skeleton skeleton" />
+      </section>
+
+      <section v-else-if="items.length" class="collection-card list-card">
+        <saved-news-card
+          v-for="item in items"
+          :key="item.id"
+          :news="item"
+          secondary-label="收藏时间"
+          :secondary-value="item.favoriteTime"
+          action-text="删除"
+          @select="goToNewsDetail"
+          @action="confirmDelete"
+        />
+      </section>
+
+      <section v-else class="collection-card empty-card">
+        <van-empty description="暂无收藏内容" />
+        <button
+          v-if="!isLogin"
+          type="button"
+          class="primary-button"
+          @click="goToLogin"
+        >
+          去登录
+        </button>
+      </section>
     </div>
-    
-    <van-empty v-else description="暂无收藏内容" />
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useFavoriteStore } from '../store/modules/favorite';
-import { showDialog } from 'vant';
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { showDialog, showToast } from 'vant'
 
-const router = useRouter();
-const favoriteStore = useFavoriteStore();
+import SavedNewsCard from '../components/SavedNewsCard.vue'
+import { useFavoriteStore } from '../store/modules/favorite'
+import { useUserStore } from '../store/user'
 
-// 返回上一页
-const onClickLeft = () => {
-  router.back();
-};
 
-// 跳转到新闻详情
-const goToNewsDetail = (id) => {
-  router.push(`/news/detail/${id}`);
-};
+const router = useRouter()
+const favoriteStore = useFavoriteStore()
+const userStore = useUserStore()
 
-// 删除单条收藏
-const removeFavorite = async (id) => {
-  const result = await favoriteStore.removeFavoriteApi(id);
-  if (result.success) {
-    // API请求成功后，更新本地收藏列表
-    favoriteStore.removeFavorite(id);
+const loading = ref(true)
+const items = computed(() => favoriteStore.getFavorites)
+const isLogin = computed(() => userStore.getLoginStatus)
+
+function onClickLeft() {
+  router.back()
+}
+
+function goToLogin() {
+  router.push('/login')
+}
+
+function goToNewsDetail(id) {
+  router.push(`/news/detail/${id}`)
+}
+
+async function hydrateFavorites() {
+  loading.value = true
+  favoriteStore.loadFavorites()
+
+  try {
+    const result = await favoriteStore.getFavoriteListApi()
+    if (!result?.success) {
+      favoriteStore.loadFavorites()
+    }
+  } catch (error) {
+    favoriteStore.loadFavorites()
+  } finally {
+    loading.value = false
   }
-};
+}
 
-// 确认删除
-const confirmDelete = (id) => {
+async function removeFavorite(id) {
+  if (!isLogin.value) {
+    favoriteStore.removeFavorite(id)
+    showToast({
+      message: '已移除本地收藏',
+      position: 'bottom',
+    })
+    return
+  }
+
+  const result = await favoriteStore.removeFavoriteApi(id)
+  if (result.success) {
+    favoriteStore.removeFavorite(id)
+    showToast({
+      message: '已移除收藏',
+      position: 'bottom',
+    })
+    return
+  }
+
+  showToast({
+    message: result.message || '删除失败，请稍后重试',
+    position: 'bottom',
+  })
+}
+
+function confirmDelete(id) {
   showDialog({
     title: '提示',
     message: '确定要删除这条收藏吗？',
     showCancelButton: true,
   }).then((action) => {
     if (action === 'confirm') {
-      removeFavorite(id);
+      removeFavorite(id)
     }
-  });
-};
+  })
+}
 
-// 清空收藏
-const onClickClear = async () => {
+function onClickClear() {
   showDialog({
     title: '提示',
     message: '确定要清空所有收藏吗？',
     showCancelButton: true,
   }).then(async (action) => {
-    if (action === 'confirm') {
-      const result = await favoriteStore.clearFavoritesApi();
-      if (!result || !result.success) {
-        // 如果API请求失败，回退到本地清空
-        // favoriteStore.clearFavorites();
-        console.log('清空收藏列表');
-      }
+    if (action !== 'confirm') {
+      return
     }
-  });
-};
 
-// 组件挂载时加载收藏数据
+    if (!isLogin.value) {
+      favoriteStore.clearFavorites()
+      showToast({
+        message: '本地收藏已清空',
+        position: 'bottom',
+      })
+      return
+    }
+
+    const result = await favoriteStore.clearFavoritesApi()
+    if (result?.success) {
+      showToast({
+        message: '收藏已清空',
+        position: 'bottom',
+      })
+      return
+    }
+
+    showToast({
+      message: result?.message || '清空失败，请稍后重试',
+      position: 'bottom',
+    })
+  })
+}
+
 onMounted(async () => {
-  // 使用API请求获取收藏列表
-  try {
-
-    const result = await favoriteStore.getFavoriteListApi();
-    if (!result || !result.success) {
-      // 如果API请求失败，回退到本地存储
-      // favoriteStore.loadFavorites();
-      console.log('从本地存储加载收藏列表');  
-    }
-  } catch (error) {
-    favoriteStore.loadFavorites();
-  }
-});
+  await hydrateFavorites()
+})
 </script>
 
 <style scoped>
-.favorite-container {
-  padding-top: 46px;
-  padding-bottom: 20px;
-  background-color: #f7f8fa;
+.collection-page {
   min-height: 100vh;
+  padding-top: 46px;
+  background:
+    radial-gradient(circle at top, rgba(183, 28, 28, 0.08), transparent 28%),
+    linear-gradient(180deg, #f6f7fb 0%, #edf1f7 100%);
 }
 
-.favorite-list {
-  padding: 10px;
+.collection-shell {
+  padding: 16px;
 }
 
-.news-item {
-  display: flex;
-  padding: 10px 0;
+.collection-hero,
+.collection-card {
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
 }
 
-.news-image {
-  width: 120px;
-  height: 80px;
-  margin-right: 12px;
-  flex-shrink: 0;
+.collection-hero {
+  color: #fff;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 32%),
+    linear-gradient(135deg, #0f172a 0%, #1f2937 60%, #7f1d1d 100%);
 }
 
-.news-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 4px;
+.collection-kicker {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.news-info {
-  flex: 1;
+.collection-hero h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.35;
+}
+
+.collection-copy {
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.nav-clear,
+.primary-button {
+  border: 0;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nav-clear {
+  background: transparent;
+  color: #b71c1c;
+}
+
+.primary-button {
+  padding: 10px 16px;
+  background: #111827;
+  color: #fff;
+}
+
+.list-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 12px;
 }
 
-.news-title {
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1.4;
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.news-meta {
-  font-size: 12px;
-  color: #999;
+.empty-card {
   display: flex;
-  flex-wrap: wrap;
-}
-
-.news-meta span {
-  margin-right: 10px;
-}
-
-.favorite-item {
-  position: relative;
-  margin-bottom: 10px;
-  background-color: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  z-index: 10;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border-radius: 50%;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 14px;
+}
+
+.collection-skeleton {
+  height: 104px;
+  border-radius: 20px;
+  margin-bottom: 12px;
 }
 </style>

@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: agentnews-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: agentnews
+      MYSQL_USER: agentnews
+      MYSQL_PASSWORD: agentnews
+    ports:
+      - "3306:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: agentnews-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: agentnews-backend
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      MYSQL_URL: mysql+aiomysql://agentnews:agentnews@mysql:3306/agentnews?charset=utf8mb4
+      REDIS_URL: redis://redis:6379/0
+      APP_ENV: docker
+      DEBUG: "false"
+      CORS_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+      VIEW_FLUSH_INTERVAL_SECONDS: 60
+      AGENT_WORKFLOW_ENGINE: langgraph
+      LOCAL_RETRIEVAL_ENGINE: hybrid-ready
+      ENABLE_VECTOR_RETRIEVAL: "true"
+      QDRANT_URL: ""
+      QDRANT_LOCAL_PATH: /app/backend/data/qdrant
+      QDRANT_COLLECTION: agentnews_news_chunks
+      QDRANT_TIMEOUT_SECONDS: 5
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_data:/app/backend/data
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+    container_name: agentnews-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  mysql_data:
+  redis_data:
+  backend_data:

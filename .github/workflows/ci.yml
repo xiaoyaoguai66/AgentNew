@@ -1,0 +1,71 @@
+name: AgentNews CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  backend-check:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_URL: mysql+aiomysql://agentnews:agentnews@localhost:3306/agentnews?charset=utf8mb4
+      REDIS_URL: redis://localhost:6379/0
+      APP_ENV: ci
+      DEBUG: "false"
+      AGENT_WORKFLOW_ENGINE: langgraph
+      LOCAL_RETRIEVAL_ENGINE: lexical
+      ENABLE_VECTOR_RETRIEVAL: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Targeted backend compile check
+        run: |
+          cd backend
+          python tests/check_backend_compile.py
+
+      - name: Import FastAPI app
+        run: |
+          cd backend
+          python -c "import main; print(main.app)"
+
+      - name: Run backend smoke checks
+        run: |
+          cd backend
+          python tests/smoke_api.py
+
+      - name: Run backend integration checks
+        run: |
+          cd backend
+          python tests/integration_api.py
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build

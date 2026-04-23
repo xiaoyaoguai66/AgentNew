@@ -1,111 +1,127 @@
 <template>
-  <div class="category">
-    <van-nav-bar 
-      :title="$t('common.allCategories')" 
+  <div class="category-page">
+    <van-nav-bar
+      :title="$t('common.allCategories')"
       :left-text="$t('common.back')"
       left-arrow
+      fixed
       @click-left="onClickLeft"
-      fixed 
     />
-    
-    <div class="category-container">
-      <van-grid :column-num="3" :border="false">
-        <van-grid-item 
-          v-for="category in displayCategories" 
+
+    <div class="category-shell">
+      <div class="category-head">
+        <p class="category-kicker">频道导航</p>
+        <h1>按主题快速进入新闻流</h1>
+      </div>
+
+      <van-grid :column-num="3" :border="false" gutter="12">
+        <van-grid-item
+          v-for="category in displayCategories"
           :key="category.id"
-          :text="getCategoryTranslation(category.name)"
+          class="category-card"
+          :text="getCategoryLabel(category.name)"
           icon="newspaper-o"
           @click="goToCategoryNews(category.id)"
         />
       </van-grid>
     </div>
-    
+
     <tab-bar />
   </div>
 </template>
 
 <script setup>
-import { useNewsStore } from '../store/modules/news'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+
 import TabBar from '../components/TabBar.vue'
-import { computed } from 'vue'
+import { useNewsStore } from '../store/modules/news'
+import { getCategoryTranslationKey } from '../utils/news'
+
 
 const newsStore = useNewsStore()
 const router = useRouter()
 const { t } = useI18n()
 
-// 计算属性：显示的分类（只显示非"更多"分类）
-const displayCategories = computed(() => {
-  return newsStore.categories.filter(category => category.name !== '更多');
-})
+const displayCategories = computed(() => newsStore.displayCategories)
 
-// 返回上一页
-const onClickLeft = () => {
+function getCategoryLabel(categoryName) {
+  const key = getCategoryTranslationKey(categoryName)
+  return key ? t(`home.categories.${key}`) : categoryName
+}
+
+function onClickLeft() {
   router.back()
 }
 
-// 跳转到对应分类的新闻列表
-const goToCategoryNews = (categoryId) => {
-  // 先切换分类
+function goToCategoryNews(categoryId) {
   newsStore.changeCategory(categoryId)
-  
-  // 使用路由参数传递分类ID
   router.push({
     path: '/home',
-    query: { categoryId: categoryId }
+    query: { categoryId },
   })
 }
 
-// 获取分类名称的翻译
-const getCategoryTranslation = (categoryName) => {
-  const categoryMap = {
-    '头条': 'headline',
-    '社会': 'society',
-    '国内': 'domestic',
-    '国际': 'international',
-    '娱乐': 'entertainment',
-    '体育': 'sports',
-    '军事': 'military',
-    '科技': 'technology',
-    '财经': 'finance',
-    '更多': 'more'
-  };
-  
-  const key = categoryMap[categoryName];
-  return key ? t(`home.categories.${key}`) : categoryName;
-}
+onMounted(async () => {
+  await newsStore.getCategories()
+})
 </script>
 
 <style scoped>
-.category {
-  padding-top: 46px;
-  padding-bottom: 50px;
-  background-color: #f7f8fa;
+.category-page {
   min-height: 100vh;
+  padding-top: 46px;
+  padding-bottom: 72px;
+  background:
+    radial-gradient(circle at top, rgba(183, 28, 28, 0.08), transparent 28%),
+    linear-gradient(180deg, #f6f7fb 0%, #edf1f7 100%);
 }
 
-.category-container {
-  padding: 16px;
-  background-color: #fff;
-  margin-top: 12px;
-  border-radius: 8px;
+.category-shell {
+  margin: 16px;
+  padding: 20px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
 }
 
-:deep(.van-grid-item__content) {
-  background-color: #f5f7fa;
-  border-radius: 8px;
+.category-head {
+  margin-bottom: 16px;
+}
+
+.category-head h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 24px;
+  line-height: 1.35;
+}
+
+.category-kicker {
+  margin: 0 0 8px;
+  color: #b71c1c;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:deep(.category-card .van-grid-item__content) {
+  border-radius: 18px;
   padding: 20px 0;
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.95) 100%);
 }
 
-:deep(.van-grid-item__icon) {
+:deep(.category-card .van-grid-item__icon) {
+  color: #b71c1c;
   font-size: 28px;
-  color: #1989fa;
 }
 
-:deep(.van-grid-item__text) {
+:deep(.category-card .van-grid-item__text) {
   margin-top: 8px;
-  color: #333;
+  color: #0f172a;
   font-size: 14px;
+  font-weight: 600;
 }
 </style>

@@ -1,0 +1,76 @@
+{
+  "cases": [
+    {
+      "caseId": "local-tech-summary",
+      "title": "本地科技热点总结",
+      "question": "根据本地新闻库总结一下科技热点",
+      "mode": "brief",
+      "timeRange": "all",
+      "category": "technology",
+      "expectedPlan": "local-first",
+      "expectedIntent": "summary",
+      "expectedFreshness": "low",
+      "expectedScope": "local"
+    },
+    {
+      "caseId": "web-satellite-latest",
+      "title": "最新卫星发射进展",
+      "question": "今天最新的卫星发射计划有什么进展",
+      "mode": "brief",
+      "timeRange": "24h",
+      "category": "general",
+      "expectedPlan": "web-first",
+      "expectedIntent": "summary",
+      "expectedFreshness": "high",
+      "expectedScope": "hybrid"
+    },
+    {
+      "caseId": "hybrid-tech-impact",
+      "title": "科技新闻对大模型行业影响",
+      "question": "最近科技新闻里哪些变化最可能影响大模型行业",
+      "mode": "brief",
+      "timeRange": "7d",
+      "category": "technology",
+      "expectedPlan": "hybrid",
+      "expectedIntent": "summary",
+      "expectedFreshness": "medium",
+      "expectedScope": "hybrid"
+    },
+    {
+      "caseId": "compare-international-tech",
+      "title": "国际与科技热点差异对比",
+      "question": "对比一下最近一周国际新闻和科技新闻的热点差异",
+      "mode": "compare",
+      "timeRange": "7d",
+      "category": "general",
+      "expectedPlan": "hybrid",
+      "expectedIntent": "compare",
+      "expectedFreshness": "medium",
+      "expectedScope": "hybrid"
+    },
+    {
+      "caseId": "local-finance-timeline",
+      "title": "站内财经动态梳理",
+      "question": "仅基于本站新闻，梳理一下最近一周的财经动态",
+      "mode": "timeline",
+      "timeRange": "7d",
+      "category": "finance",
+      "expectedPlan": "local-first",
+      "expectedIntent": "timeline",
+      "expectedFreshness": "medium",
+      "expectedScope": "local"
+    },
+    {
+      "caseId": "web-llm-financing",
+      "title": "联网查询大模型融资动态",
+      "question": "帮我联网查一下今天大模型融资的最新消息",
+      "mode": "brief",
+      "timeRange": "24h",
+      "category": "technology",
+      "expectedPlan": "web-first",
+      "expectedIntent": "summary",
+      "expectedFreshness": "high",
+      "expectedScope": "web"
+    }
+  ]
+}
